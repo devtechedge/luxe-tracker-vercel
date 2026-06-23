@@ -10,95 +10,100 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell, ChartTooltip } from '@/components/ui/panel-shell'
 import { getConflicts } from '@/lib/analytics'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-
-const RISK_COLORS: Record<string, 'destructive' | 'warning' | 'success'> = {
-  high: 'destructive',
-  medium: 'warning',
-  low: 'success',
-}
 
 export function LaunchConflicts() {
   const data = useMemo(() => getConflicts(), [])
+  const high = data.conflictDays.filter((d) => d.cannibalizationRisk === 'high').length
+  const medium = data.conflictDays.filter((d) => d.cannibalizationRisk === 'medium').length
 
   return (
-    <Card>
-      <CardHeader>
+    <PanelShell
+      category="Market"
+      title="Launch Conflict Radar"
+      subtitle={`${data.totalConflicts} conflict days detected across ${data.weeklyDensity.length} weeks`}
+      caption="Identifies overlapping drop windows that cannibalize demand. Brighter bars = higher launch density in that week."
+    >
+      {/* KPI strip */}
+      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
         <div>
-          <CardTitle>⚔️ Launch Conflict Radar</CardTitle>
-          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-            <span className="text-[var(--color-accent)]">{data.totalConflicts} conflict days</span> detected ·{' '}
-            cannibalization across brands
-          </p>
+          <div className="label mb-1">Total conflicts</div>
+          <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.totalConflicts}</div>
         </div>
-      </CardHeader>
-      <CardContent>
-        {/* Weekly density chart */}
-        <div className="mb-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <div className="mb-2 text-xs uppercase tracking-wider text-[var(--color-ink-muted)]">
-            Weekly launch density
-          </div>
-          <div className="h-48 w-full">
-            <ResponsiveContainer>
-              <BarChart data={data.weeklyDensity} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-                <XAxis dataKey="weekStart" stroke="rgba(255,255,255,0.3)" fontSize={10} />
-                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0d1220',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 6,
-                    fontSize: 11,
-                  }}
-                />
-                <Bar dataKey="totalLaunches" fill="#f97316" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div>
+          <div className="label mb-1">High risk</div>
+          <div className="hero-num text-[36px] text-[var(--color-negative)]">{high}</div>
         </div>
+        <div>
+          <div className="label mb-1">Medium risk</div>
+          <div className="hero-num text-[36px] text-[var(--color-warning)]">{medium}</div>
+        </div>
+        <div>
+          <div className="label mb-1">Weeks tracked</div>
+          <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.weeklyDensity.length}</div>
+        </div>
+      </div>
 
-        {/* Conflict days */}
-        <div className="space-y-2">
+      {/* Weekly density chart */}
+      <section className="mb-10">
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">Weekly launch density</div>
+        </div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.weeklyDensity} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="weekStart" stroke="var(--color-ink-subtle)" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--color-ink-subtle)" fontSize={10} tickLine={false} axisLine={false} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--color-surface-2)' }} />
+              <Bar dataKey="totalLaunches" fill="var(--color-accent)" radius={[1, 1, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      {/* Conflict days list */}
+      <section>
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">Conflict days</div>
+        </div>
+        <div className="space-y-px">
           {data.conflictDays.slice(0, 8).map((day) => (
-            <div
+            <article
               key={day.date}
-              className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+              className="flex items-baseline justify-between gap-4 border-b border-[var(--color-border)] py-3 transition-colors hover:bg-[var(--color-surface)]"
             >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm font-semibold text-[var(--color-ink)]">
-                    {day.date}
-                  </span>
-                  <Badge variant="secondary">{day.eventCount} launches</Badge>
-                  <Badge variant={RISK_COLORS[day.cannibalizationRisk]}>
-                    {day.cannibalizationRisk} risk
-                  </Badge>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {day.brands.slice(0, 3).map((b) => (
-                    <Badge key={b} variant="outline" className="text-[10px]">
-                      {b}
-                    </Badge>
-                  ))}
-                </div>
+              <div className="flex items-baseline gap-4">
+                <span className="font-mono text-[12px] tabular-nums text-[var(--color-ink)]">{day.date}</span>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+                  {day.eventCount} launches
+                </span>
+                <span
+                  className={`text-[10px] uppercase tracking-[0.12em] ${
+                    day.cannibalizationRisk === 'high'
+                      ? 'text-[var(--color-negative)]'
+                      : day.cannibalizationRisk === 'medium'
+                        ? 'text-[var(--color-warning)]'
+                        : 'text-[var(--color-ink-subtle)]'
+                  }`}
+                >
+                  {day.cannibalizationRisk} risk
+                </span>
               </div>
-              <div className="space-y-1 text-[11px]">
-                {day.events.slice(0, 3).map((e, i) => (
-                  <div key={i} className="flex items-center gap-2 text-[var(--color-ink-muted)]">
-                    <span className="size-1 rounded-full bg-[var(--color-accent)]" />
-                    <span className="truncate">{e.productName}</span>
-                    <span className="text-[var(--color-ink-subtle)]">·</span>
-                    <span>{e.region}</span>
-                  </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {day.brands.slice(0, 4).map((b) => (
+                  <span key={b} className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-muted)]">
+                    {b}
+                  </span>
                 ))}
               </div>
-            </div>
+            </article>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </section>
+    </PanelShell>
   )
 }

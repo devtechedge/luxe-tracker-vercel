@@ -9,12 +9,10 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend,
 } from 'recharts'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell, ChartTooltip } from '@/components/ui/panel-shell'
 import { getCompetitiveMatrix } from '@/lib/analytics'
 import { fmtEUR } from '@/lib/utils'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const BRAND_COLORS: Record<string, string> = {
   Prada: '#a855f7',
@@ -27,91 +25,90 @@ const BRAND_COLORS: Record<string, string> = {
 export function CompetitiveMatrix() {
   const data = useMemo(() => getCompetitiveMatrix(), [])
 
-  // Prepare data for grouped bar chart
-  const chartData = useMemo(() => {
-    return data.categories.map((cat) => {
-      const row: Record<string, any> = { category: cat.category }
-      for (const b of cat.brands) {
-        row[b.brand] = b.avgPriceEUR
-      }
-      return row
-    })
-  }, [data])
+  const chartData = useMemo(
+    () =>
+      data.categories.map((cat) => {
+        const row: Record<string, any> = { category: cat.category }
+        for (const b of cat.brands) row[b.brand] = b.avgPriceEUR
+        return row
+      }),
+    [data],
+  )
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>🆚 Competitive Brand Comparison</CardTitle>
-          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-            Average EU price per category · value leader vs premium leader
-          </p>
+    <PanelShell
+      category="Market"
+      title="Competitive Brand Comparison"
+      subtitle="Average EU retail price per category"
+      caption="Which brand carries the value-leader title, and which commands the premium. Spread = dispersion within category."
+    >
+      <section className="mb-8">
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">EU price by category × brand</div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 h-64 w-full">
-          <ResponsiveContainer>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-              <XAxis dataKey="category" stroke="rgba(255,255,255,0.3)" fontSize={11} />
+              <CartesianGrid stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="category" stroke="var(--color-ink-muted)" fontSize={11} tickLine={false} axisLine={false} />
               <YAxis
-                stroke="rgba(255,255,255,0.3)"
+                stroke="var(--color-ink-subtle)"
                 fontSize={10}
                 tickFormatter={(v) => `€${v}`}
+                tickLine={false}
+                axisLine={false}
               />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#0d1220',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 6,
-                  fontSize: 11,
-                }}
-                formatter={(v: number) => fmtEUR(v, 0)}
-              />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Tooltip content={<ChartTooltip formatter={(v) => fmtEUR(v, 0)} />} cursor={{ fill: 'var(--color-surface-2)' }} />
               {Object.keys(BRAND_COLORS).map((brand) => (
                 <Bar
                   key={brand}
                   dataKey={brand}
                   fill={BRAND_COLORS[brand]}
-                  radius={[2, 2, 0, 0]}
+                  radius={[1, 1, 0, 0]}
                 />
               ))}
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </section>
 
-        {/* Category summaries */}
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+      <section>
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">By category</div>
+        </div>
+        <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
           {data.categories.map((cat) => (
-            <div
-              key={cat.category}
-              className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-[var(--color-ink)]">{cat.category}</h4>
-                <Badge variant="secondary">{cat.totalProducts} products</Badge>
+            <article key={cat.category} className="bg-[var(--color-bg)] p-4">
+              <div className="mb-3 flex items-baseline justify-between">
+                <h4 className="font-display text-[15px] font-medium tracking-tight text-[var(--color-ink)]">
+                  {cat.category}
+                </h4>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-subtle)]">
+                  {cat.totalProducts} products
+                </span>
               </div>
-              <div className="space-y-1.5 text-[11px]">
+              <dl className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-ink-muted)]">Value leader:</span>
-                  <span className="font-medium text-[var(--color-positive)]">{cat.valueLeader}</span>
+                  <dt className="text-[var(--color-ink-subtle)]">Value leader</dt>
+                  <dd className="font-medium text-[var(--color-positive)]">{cat.valueLeader}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-ink-muted)]">Premium leader:</span>
-                  <span className="font-medium text-[var(--color-accent)]">{cat.premiumLeader}</span>
+                  <dt className="text-[var(--color-ink-subtle)]">Premium leader</dt>
+                  <dd className="font-medium text-[var(--color-accent)]">{cat.premiumLeader}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-ink-muted)]">Spread:</span>
-                  <span className="font-mono text-[var(--color-ink)]">
+                  <dt className="text-[var(--color-ink-subtle)]">Spread</dt>
+                  <dd className="font-mono tabular-nums text-[var(--color-ink)]">
                     {fmtEUR(cat.priceSpreadEUR, 0)} ({cat.priceSpreadPct.toFixed(1)}%)
-                  </span>
+                  </dd>
                 </div>
-              </div>
-            </div>
+              </dl>
+            </article>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </section>
+    </PanelShell>
   )
 }

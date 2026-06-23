@@ -43,7 +43,7 @@ function TabsList({ className, children }: React.HTMLAttributes<HTMLDivElement>)
   return (
     <div
       className={cn(
-        'inline-flex h-9 items-center justify-start gap-1 rounded-md border border-white/10 bg-white/[0.02] p-1 text-gray-400',
+        'inline-flex h-9 items-center justify-start gap-1 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-1 text-[var(--color-ink-muted)]',
         className,
       )}
     >
@@ -67,8 +67,8 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         className={cn(
           'inline-flex items-center justify-center whitespace-nowrap rounded px-3 py-1 text-xs font-medium transition-all',
           isActive
-            ? 'bg-orange-500/15 text-orange-300 shadow-sm'
-            : 'hover:bg-white/5 hover:text-white',
+            ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)] shadow-sm'
+            : 'hover:bg-[var(--color-surface-2)] hover:text-[var(--color-ink)]',
           className,
         )}
         data-state={isActive ? 'active' : 'inactive'}

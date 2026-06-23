@@ -52,7 +52,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
         type="button"
         onClick={() => ctx.setOpen(!ctx.open)}
         className={cn(
-          'flex h-9 w-full items-center justify-between rounded-md border border-white/10 bg-white/[0.03] px-3 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-orange-500',
+          'flex h-9 w-full items-center justify-between rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-sm text-[var(--color-ink)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]',
           className,
         )}
         {...props}
@@ -67,14 +67,14 @@ SelectTrigger.displayName = 'SelectTrigger'
 
 function SelectValue({ placeholder }: { placeholder?: string }) {
   const ctx = useSelect()
-  return <span className={cn(!ctx.value && 'text-gray-500')}>{ctx.value || placeholder}</span>
+  return <span className={cn(!ctx.value && 'text-[var(--color-ink-faint)]')}>{ctx.value || placeholder}</span>
 }
 
 function SelectContent({ children, className }: { children: React.ReactNode; className?: string }) {
   const ctx = useSelect()
   if (!ctx.open) return null
   return (
-    <div className={cn('absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-md border border-white/10 bg-[#0d1220] shadow-2xl', className)}>
+    <div className={cn('absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl', className)}>
       <div className="max-h-60 overflow-y-auto p-1">{children}</div>
     </div>
   )
@@ -87,8 +87,8 @@ function SelectItem({ value, children }: { value: string; children: React.ReactN
     <div
       onClick={() => ctx.onValueChange(value)}
       className={cn(
-        'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-white/5',
-        isSelected && 'bg-white/10 text-white',
+        'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-[var(--color-surface-2)] text-[var(--color-ink)]',
+        isSelected && 'bg-[var(--color-surface-2)] text-[var(--color-ink)]',
       )}
     >
       {children}

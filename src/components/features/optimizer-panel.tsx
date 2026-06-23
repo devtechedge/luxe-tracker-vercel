@@ -1,13 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell } from '@/components/ui/panel-shell'
 import { Button } from '@/components/ui/button'
-import { TrendingDown, Plane, ShoppingCart } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { getOptimizer } from '@/lib/analytics'
 import { getProducts } from '@/lib/analytics'
 import { fmtEUR } from '@/lib/utils'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const TARGET_REGIONS = ['EU', 'US', 'UK', 'Norway', 'India']
 
@@ -24,28 +23,21 @@ export function OptimizerPanel() {
   if (!result) return null
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>
-            <Plane className="size-4 text-[var(--color-positive)]" />
-            Landed Cost Optimizer
-          </CardTitle>
-          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-            Cheapest route to acquire a product in your target region
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+    <PanelShell
+      category="Pricing"
+      title="Landed Cost Optimizer"
+      subtitle="Cheapest route to acquire a product in your target region"
+      caption="Compares buy-local vs buy-elsewhere-shipping, factoring shipping cost and import duty. Saves = local price minus landed cost."
+    >
+      <section className="mb-8">
+        <div className="rule" />
+        <div className="grid grid-cols-1 gap-6 py-6 md:grid-cols-[1fr,300px]">
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
-              Product
-            </label>
+            <label className="mb-2 block label">Product</label>
             <select
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="h-9 w-full rounded-md border border-[var(--color-border)] bg-white/[0.03] px-3 text-sm text-[var(--color-ink)]"
+              className="h-10 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -55,9 +47,7 @@ export function OptimizerPanel() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
-              Target Region
-            </label>
+            <label className="mb-2 block label">Target region</label>
             <div className="flex gap-1">
               {TARGET_REGIONS.map((r) => (
                 <Button
@@ -73,96 +63,115 @@ export function OptimizerPanel() {
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Best route highlight */}
-        <div className="mb-4 rounded-lg border border-[var(--color-positive)] bg-[var(--color-positive)]/5 p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs uppercase tracking-wider text-[var(--color-positive)]">
-              ✓ Best Route
-            </span>
-            <Badge variant="success">{result.bestRoute.sourceRegion}</Badge>
+      {/* Best route highlight */}
+      <section className="mb-8">
+        <div className="rule" />
+        <div className="grid grid-cols-1 gap-8 py-6 md:grid-cols-[1fr,1fr]">
+          <div>
+            <div className="label mb-1">Best route</div>
+            <div className="mt-1 flex items-baseline gap-3">
+              <span className="font-display text-[44px] font-medium leading-none tracking-tight text-[var(--color-ink)]">
+                {result.bestRoute.sourceRegion}
+              </span>
+              <span className="text-[12px] text-[var(--color-ink-muted)]">→ {targetRegion}</span>
+            </div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+              Stock {result.bestRoute.stockLevelAtSource}% · {result.bestRoute.stockStatusAtSource}
+            </div>
           </div>
-          <div className="text-2xl font-bold text-[var(--color-ink)]">
-            {fmtEUR(result.bestRoute.totalLandedCostEUR, 0)}
-          </div>
-          <div className="mt-1 text-xs text-[var(--color-ink-muted)]">
-            Total landed cost in {targetRegion} · saves{' '}
-            <span className="font-mono text-[var(--color-positive)]">
-              {fmtEUR(result.potentialSavingsEUR, 0)}
-            </span>{' '}
-            vs buying locally ({fmtEUR(result.localPriceEUR, 0)})
+          <div>
+            <div className="label">Landed cost</div>
+            <div className="hero-num mt-1 text-[64px] tabular-nums text-[var(--color-ink)]">
+              {fmtEUR(result.bestRoute.totalLandedCostEUR, 0)}
+            </div>
+            <div className="mt-1 text-[11px] text-[var(--color-ink-muted)]">
+              vs{' '}
+              <span className="font-mono tabular-nums">{fmtEUR(result.localPriceEUR, 0)}</span> local · saves{' '}
+              <span
+                className={`font-mono tabular-nums ${
+                  result.potentialSavingsEUR > 0 ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]'
+                }`}
+              >
+                {fmtEUR(result.potentialSavingsEUR, 0)}
+              </span>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* All routes table */}
-        <div className="overflow-hidden rounded-md border border-[var(--color-border)]">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface)] text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
-                <th className="px-3 py-2 text-left font-medium">Source</th>
-                <th className="px-3 py-2 text-right font-medium">Local Price</th>
-                <th className="px-3 py-2 text-right font-medium">+ Ship</th>
-                <th className="px-3 py-2 text-right font-medium">+ Duty</th>
-                <th className="px-3 py-2 text-right font-medium">Total</th>
-                <th className="px-3 py-2 text-right font-medium">Savings</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.allRoutes.map((r) => (
-                <tr
-                  key={r.sourceRegion}
-                  className={`border-b border-[var(--color-border)] ${
-                    r.isLocalPurchase ? 'bg-[var(--color-accent)]/5' : ''
-                  }`}
-                >
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[var(--color-ink)]">{r.sourceRegion}</span>
-                      {r.isLocalPurchase && (
-                        <ShoppingCart className="size-3 text-[var(--color-accent)]" />
-                      )}
-                    </div>
-                    <div className="text-[10px] text-[var(--color-ink-muted)]">
-                      Stock: {r.stockLevelAtSource}% · {r.stockStatusAtSource}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--color-ink)]">
-                    {fmtEUR(r.sourcePriceEUR, 0)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--color-ink-muted)]">
-                    +{fmtEUR(r.shippingCostEUR, 0)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--color-ink-muted)]">
-                    +{fmtEUR(r.importDutyAmountEUR, 0)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono font-bold text-[var(--color-ink)]">
-                    {fmtEUR(r.totalLandedCostEUR, 0)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono">
-                    {r.isLocalPurchase ? (
-                      <span className="text-[var(--color-ink-muted)]">—</span>
-                    ) : (
-                      <span
-                        className={
-                          r.savingsVsLocalPct > 0 ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]'
-                        }
-                      >
-                        {r.savingsVsLocalPct > 0 ? (
-                          <>
-                            <TrendingDown className="inline size-3" /> {r.savingsVsLocalPct.toFixed(1)}%
-                          </>
-                        ) : (
-                          <>−{Math.abs(r.savingsVsLocalPct).toFixed(1)}%</>
-                        )}
+      {/* All routes table */}
+      <section>
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">All routes compared</div>
+        </div>
+        <table className="w-full text-[12px] tabular-nums">
+          <thead>
+            <tr className="border-b border-[var(--color-border)]">
+              <th className="py-2 text-left"><span className="label">Source</span></th>
+              <th className="px-3 text-right"><span className="label">Local Price</span></th>
+              <th className="px-3 text-right"><span className="label">+ Ship</span></th>
+              <th className="px-3 text-right"><span className="label">+ Duty</span></th>
+              <th className="px-3 text-right"><span className="label">Total</span></th>
+              <th className="px-3 text-right"><span className="label">vs Local</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.allRoutes.map((r) => (
+              <tr
+                key={r.sourceRegion}
+                className={`border-b border-[var(--color-border)] data-row ${
+                  r.isLocalPurchase ? 'bg-[var(--color-surface-2)]' : ''
+                }`}
+              >
+                <td className="py-2.5">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[var(--color-ink)]">{r.sourceRegion}</span>
+                    {r.isLocalPurchase && (
+                      <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-warning)]">
+                        local
                       </span>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    Stock {r.stockLevelAtSource}%
+                  </div>
+                </td>
+                <td className="px-3 text-right font-mono text-[var(--color-ink-muted)]">
+                  {fmtEUR(r.sourcePriceEUR, 0)}
+                </td>
+                <td className="px-3 text-right font-mono text-[var(--color-ink-subtle)]">
+                  +{fmtEUR(r.shippingCostEUR, 0)}
+                </td>
+                <td className="px-3 text-right font-mono text-[var(--color-ink-subtle)]">
+                  +{fmtEUR(r.importDutyAmountEUR, 0)}
+                </td>
+                <td className="px-3 text-right font-mono font-medium text-[var(--color-ink)]">
+                  {fmtEUR(r.totalLandedCostEUR, 0)}
+                </td>
+                <td
+                  className={`px-3 text-right font-mono ${
+                    r.isLocalPurchase
+                      ? 'text-[var(--color-ink-faint)]'
+                      : r.savingsVsLocalPct > 0
+                        ? 'text-[var(--color-positive)]'
+                        : 'text-[var(--color-negative)]'
+                  }`}
+                >
+                  {r.isLocalPurchase
+                    ? '—'
+                    : r.savingsVsLocalPct > 0
+                      ? `+${r.savingsVsLocalPct.toFixed(1)}%`
+                      : `${r.savingsVsLocalPct.toFixed(1)}%`}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="rule mt-1" />
+      </section>
+    </PanelShell>
   )
 }

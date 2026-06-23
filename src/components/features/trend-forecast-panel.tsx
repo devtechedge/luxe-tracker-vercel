@@ -1,17 +1,15 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell } from '@/components/ui/panel-shell'
 import { getTrends } from '@/lib/analytics'
-import { TrendingUp, Sparkles } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
-const TYPE_ICONS: Record<string, string> = {
-  color: '🎨',
-  material: '🧵',
-  silhouette: '👗',
-  accessory: '💍',
-  vibe: '✨',
+const TYPE_LABEL: Record<string, string> = {
+  color: 'Color',
+  material: 'Material',
+  silhouette: 'Silhouette',
+  accessory: 'Accessory',
+  vibe: 'Vibe',
 }
 
 export function TrendForecastPanel() {
@@ -25,98 +23,112 @@ export function TrendForecastPanel() {
   const seasons = Array.from(new Set(allTrends.map((t) => t.season)))
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>
-              <Sparkles className="size-4 text-pink-400" />
-              Seasonal Trend Forecast
-            </CardTitle>
-            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-              {allTrends.length} predicted trends · intensity + confidence scoring
-            </p>
-          </div>
-          <select
-            value={season}
-            onChange={(e) => setSeason(e.target.value)}
-            className="h-9 rounded-md border border-[var(--color-border)] bg-white/[0.03] px-2 text-xs text-[var(--color-ink)]"
+    <PanelShell
+      category="Luxury"
+      title="Seasonal Trend Forecast"
+      subtitle={`${allTrends.length} predicted trends · ${seasons.length} seasons tracked`}
+      caption="Composite intensity + confidence score. Each trend is scored on predicted demand strength and forecast reliability."
+    >
+      {/* Season filter */}
+      <div className="mb-4 flex items-center justify-between border-b border-[var(--color-border)]">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setSeason('all')}
+            className={`-mb-px border-b px-3 py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+              season === 'all'
+                ? 'border-[var(--color-accent)] text-[var(--color-ink)]'
+                : 'border-transparent text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]'
+            }`}
           >
-            <option value="all">All seasons</option>
-            {seasons.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            All seasons
+          </button>
+          {seasons.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSeason(s)}
+              className={`-mb-px border-b px-3 py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+                season === s
+                  ? 'border-[var(--color-accent)] text-[var(--color-ink)]'
+                  : 'border-transparent text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.slice(0, 12).map((t) => {
-            const intensityColor =
-              t.intensity >= 80 ? '#ef4444' : t.intensity >= 60 ? '#f97316' : '#f59e0b'
-            return (
-              <div
-                key={t.id}
-                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
-                style={{ borderLeftColor: intensityColor, borderLeftWidth: 3 }}
-              >
-                <div className="mb-2 flex items-start justify-between gap-2">
-                  <div>
-                    <div className="text-base font-semibold text-[var(--color-ink)]">
-                      {TYPE_ICONS[t.trendType] || '✨'} {t.trendName}
-                    </div>
-                    <div className="text-[11px] text-[var(--color-ink-muted)]">
-                      {t.season} {t.year} · {t.category}
-                    </div>
+        <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-subtle)]">
+          {filtered.length} trends
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
+        {filtered.slice(0, 12).map((t) => {
+          const intensityColor =
+            t.intensity >= 80
+              ? 'var(--color-negative)'
+              : t.intensity >= 60
+                ? 'var(--color-accent)'
+                : 'var(--color-warning)'
+          return (
+            <article
+              key={t.id}
+              className="bg-[var(--color-bg)] p-4 transition-colors hover:bg-[var(--color-surface)]"
+              style={{ borderLeft: `2px solid ${intensityColor}` }}
+            >
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <div>
+                  <div className="font-display text-[15px] font-medium tracking-tight text-[var(--color-ink)]">
+                    {t.trendName}
                   </div>
-                  <Badge variant="secondary" className="text-[10px] uppercase">
-                    {t.trendType}
-                  </Badge>
-                </div>
-                <div className="mt-3 space-y-2">
-                  <div>
-                    <div className="mb-0.5 flex justify-between text-[11px]">
-                      <span className="text-[var(--color-ink-muted)]">Intensity</span>
-                      <span className="font-mono font-bold" style={{ color: intensityColor }}>
-                        {t.intensity}
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-2)]">
-                      <div
-                        className="h-full transition-all duration-300"
-                        style={{ width: `${t.intensity}%`, backgroundColor: intensityColor }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-0.5 flex justify-between text-[11px]">
-                      <span className="text-[var(--color-ink-muted)]">Confidence</span>
-                      <span className="font-mono text-[var(--color-ink)]">{t.confidence}%</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-2)]">
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
-                        style={{ width: `${t.confidence}%` }}
-                      />
-                    </div>
+                  <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    {t.season} {t.year} · {t.category}
                   </div>
                 </div>
-                {t.keyBrands && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {(JSON.parse(t.keyBrands) as string[]).map((b) => (
-                      <Badge key={b} variant="outline" className="text-[10px]">
-                        {b}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-muted)]">
+                  {TYPE_LABEL[t.trendType] || t.trendType}
+                </span>
               </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
+
+              <div className="space-y-2">
+                <div>
+                  <div className="mb-0.5 flex justify-between text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    <span>Intensity</span>
+                    <span className="font-mono tabular-nums" style={{ color: intensityColor }}>
+                      {t.intensity}
+                    </span>
+                  </div>
+                  <div className="h-1 w-full overflow-hidden bg-[var(--color-surface-2)]">
+                    <div
+                      className="h-full transition-all duration-300"
+                      style={{ width: `${t.intensity}%`, backgroundColor: intensityColor }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-0.5 flex justify-between text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    <span>Confidence</span>
+                    <span className="font-mono tabular-nums text-[var(--color-ink)]">{t.confidence}%</span>
+                  </div>
+                  <div className="h-1 w-full overflow-hidden bg-[var(--color-surface-2)]">
+                    <div
+                      className="h-full bg-[var(--color-positive)]"
+                      style={{ width: `${t.confidence}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {t.keyBrands && (
+                <div className="mt-3 flex flex-wrap gap-x-2 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                  {(JSON.parse(t.keyBrands) as string[]).map((b) => (
+                    <span key={b}>{b}</span>
+                  ))}
+                </div>
+              )}
+            </article>
+          )
+        })}
+      </div>
+    </PanelShell>
   )
 }

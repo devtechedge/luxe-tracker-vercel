@@ -10,131 +10,117 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell, ChartTooltip } from '@/components/ui/panel-shell'
 import { getVolatility } from '@/lib/analytics'
 import { fmtPct } from '@/lib/utils'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
-const RISK_COLORS: Record<string, 'destructive' | 'warning' | 'success'> = {
-  high: 'destructive',
-  medium: 'warning',
-  low: 'success',
+const RISK_COLOR: Record<string, string> = {
+  high: 'var(--color-negative)',
+  medium: 'var(--color-warning)',
+  low: 'var(--color-positive)',
 }
 
 export function FxVolatility() {
   const data = useMemo(() => getVolatility(), [])
   const [featuredIdx, setFeaturedIdx] = useState(0)
-  const featured = data.pairs[featuredIdx] || data.pairs[0]
+  const featured = data.pairs[featuredIdx] ?? data.pairs[0]
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>💱 Currency Volatility Hedge Calculator</CardTitle>
-            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-              90-day FX history · overall risk: {data.overallRisk}/100
-            </p>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {/* Featured chart */}
-        <div className="mb-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-semibold text-[var(--color-ink)]">{featured?.pair}</div>
-              <div className="text-[11px] text-[var(--color-ink-muted)]">90-day daily series</div>
+    <PanelShell
+      category="Pricing"
+      title="Currency Volatility Hedge Calculator"
+      subtitle={`90-day FX history · overall risk ${data.overallRisk}/100`}
+      caption="Range, volatility, and risk score per currency pair. Higher volatility = greater exposure to FX swings."
+    >
+      {/* KPI strip */}
+      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+        {data.pairs.slice(0, 4).map((p) => (
+          <button
+            key={p.pair}
+            onClick={() => setFeaturedIdx(data.pairs.indexOf(p))}
+            className={`text-left transition-opacity hover:opacity-80 ${
+              p.pair === featured.pair ? '' : 'opacity-60'
+            }`}
+          >
+            <div className="label mb-1">{p.pair}</div>
+            <div className="hero-num text-[28px] tabular-nums text-[var(--color-ink)]">
+              {p.currentRate.toFixed(4)}
             </div>
-            <Badge variant={RISK_COLORS[featured?.riskLevel || 'low']}>
-              {featured?.riskLevel?.toUpperCase()} RISK · {featured?.riskScore}
-            </Badge>
-          </div>
-          <div className="h-52 w-full">
-            <ResponsiveContainer>
-              <AreaChart
-                data={featured?.series || []}
-                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id={`fx-${featured?.pair}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-                <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={10} interval="preserveStartEnd" />
-                <YAxis
-                  stroke="rgba(255,255,255,0.3)"
-                  fontSize={10}
-                  domain={['dataMin - 0.05', 'dataMax + 0.05']}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0d1220',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 6,
-                    fontSize: 11,
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="rate"
-                  stroke="#f97316"
-                  strokeWidth={2}
-                  fill={`url(#fx-${featured?.pair})`}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-3 grid grid-cols-4 gap-3 text-center">
-            <Stat label="Current" value={featured?.currentRate.toFixed(4) || '—'} />
-            <Stat label="Min" value={featured?.min.toFixed(4) || '—'} accent="emerald" />
-            <Stat label="Max" value={featured?.max.toFixed(4) || '—'} accent="red" />
-            <Stat
-              label="90d Change"
-              value={(featured?.change90dPct ?? 0) >= 0 ? fmtPct(featured?.change90dPct ?? 0) : fmtPct(featured?.change90dPct ?? 0)}
-              accent={(featured?.change90dPct ?? 0) >= 0 ? 'red' : 'emerald'}
-            />
-          </div>
-        </div>
-
-        {/* Pair selector grid */}
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {data.pairs.map((p, i) => (
-            <button
-              key={p.pair}
-              onClick={() => setFeaturedIdx(i)}
-              className={`flex items-center justify-between rounded-md border p-3 text-left transition-all ${
-                i === featuredIdx
-                  ? 'border-[var(--color-border-strong)] bg-[var(--color-accent)]/5'
-                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-white/[0.04]'
-              }`}
-            >
-              <div>
-                <div className="text-sm font-semibold text-[var(--color-ink)]">{p.pair}</div>
-                <div className="text-[10px] text-[var(--color-ink-muted)]">
-                  Vol: {p.volatilityPct.toFixed(2)}% · Range: {p.rangePct.toFixed(2)}%
-                </div>
-              </div>
-              <Badge variant={RISK_COLORS[p.riskLevel]}>{p.riskLevel}</Badge>
-            </button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function Stat({ label, value, accent }: { label: string; value: string; accent?: 'emerald' | 'red' }) {
-  const color = accent === 'emerald' ? '#10b981' : accent === 'red' ? '#ef4444' : '#94a3b8'
-  return (
-    <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-2">
-      <div className="text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">{label}</div>
-      <div className="mt-0.5 font-mono text-sm font-bold" style={{ color }}>
-        {value}
+            <div className="mt-1 text-[10px] uppercase tracking-[0.12em]" style={{ color: RISK_COLOR[p.riskLevel] }}>
+              {p.riskLevel} risk
+            </div>
+          </button>
+        ))}
       </div>
-    </div>
+
+      {/* Featured chart */}
+      <section>
+        <div className="rule" />
+        <div className="grid grid-cols-1 gap-8 py-5 lg:grid-cols-[1fr,300px]">
+          <div>
+            <div className="mb-1 label">90-day series</div>
+            <h3 className="font-display text-[20px] font-medium tracking-tight text-[var(--color-ink)]">
+              {featured?.pair}
+            </h3>
+            <div className="mt-4 h-[260px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={featured?.series || []} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id={`fx-${featured?.pair}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="var(--color-border)" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--color-ink-subtle)"
+                    fontSize={10}
+                    interval="preserveStartEnd"
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="var(--color-ink-subtle)"
+                    fontSize={10}
+                    domain={['dataMin - 0.05', 'dataMax + 0.05']}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--color-ink-faint)' }} />
+                  <Area
+                    type="monotone"
+                    dataKey="rate"
+                    stroke="var(--color-accent)"
+                    strokeWidth={1.5}
+                    fill={`url(#fx-${featured?.pair})`}
+                    isAnimationActive={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center border-l border-[var(--color-border)] pl-8">
+            <div className="label">90-day change</div>
+            <div
+              className="hero-num mt-1 text-[64px]"
+              style={{
+                color:
+                  (featured?.change90dPct ?? 0) >= 0 ? 'var(--color-negative)' : 'var(--color-positive)',
+              }}
+            >
+              {fmtPct(featured?.change90dPct ?? 0)}
+            </div>
+            <div className="mt-2 font-mono text-[12px] tabular-nums text-[var(--color-ink-muted)]">
+              {featured?.min.toFixed(4)} → {featured?.max.toFixed(4)}
+            </div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+              range {featured?.rangePct.toFixed(2)}% · volatility {featured?.volatilityPct.toFixed(2)}%
+            </div>
+          </div>
+        </div>
+      </section>
+    </PanelShell>
   )
 }

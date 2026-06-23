@@ -2,17 +2,24 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
+// Badge — fully theme-aware (dark + light mode)
 const badgeVariants = cva(
   'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-orange-500/15 text-orange-300',
-        secondary: 'border-transparent bg-white/10 text-gray-300',
-        destructive: 'border-transparent bg-red-500/15 text-red-300',
-        outline: 'border-white/10 text-white',
-        success: 'border-transparent bg-emerald-500/15 text-emerald-300',
-        warning: 'border-transparent bg-amber-500/15 text-amber-300',
+        default:
+          'border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] text-[var(--color-accent)]',
+        secondary:
+          'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-ink-muted)]',
+        destructive:
+          'border-[var(--color-negative)]/30 bg-[var(--color-negative-soft)] text-[var(--color-negative)]',
+        outline:
+          'border-[var(--color-border-strong)] text-[var(--color-ink)]',
+        success:
+          'border-[var(--color-positive)]/30 bg-[var(--color-positive-soft)] text-[var(--color-positive)]',
+        warning:
+          'border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]',
       },
     },
     defaultVariants: { variant: 'default' },

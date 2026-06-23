@@ -27,6 +27,7 @@
   --color-negative: #EF4444;
   --color-negative-soft: rgba(239, 68, 68, 0.12);
   --color-warning: #F59E0B;
+  --color-warning-soft: rgba(245, 158, 11, 0.12);
   --color-info: #6B7280;
 
   --font-display: "New York", "Iowan Old Style", "Charter", "Georgia", ui-serif, serif;
@@ -58,6 +59,7 @@
   --color-negative: #DC2626;
   --color-negative-soft: rgba(220, 38, 38, 0.10);
   --color-warning: #D97706;
+  --color-warning-soft: rgba(217, 119, 6, 0.10);
   --color-info: #6B7280;
 }
 

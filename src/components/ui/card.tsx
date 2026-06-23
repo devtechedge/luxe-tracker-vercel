@@ -1,11 +1,15 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
+// Card — fully theme-aware (dark + light mode)
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-lg border border-white/5 bg-[#0d1220] shadow-sm', className)}
+      className={cn(
+        'border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink)]',
+        className,
+      )}
       {...props}
     />
   ),
@@ -14,7 +18,11 @@ Card.displayName = 'Card'
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-5 pb-3', className)} {...props} />
+    <div
+      ref={ref}
+      className={cn('flex flex-col space-y-1.5 p-5 pb-3', className)}
+      {...props}
+    />
   ),
 )
 CardHeader.displayName = 'CardHeader'
@@ -23,7 +31,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('flex items-center gap-2 text-base font-semibold text-white', className)}
+      className={cn('flex items-center gap-2 text-base font-semibold text-[var(--color-ink)]', className)}
       {...props}
     />
   ),
@@ -34,13 +42,17 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-xs text-gray-500', className)} {...props} />
+  <p
+    ref={ref}
+    className={cn('text-xs text-[var(--color-ink-muted)]', className)}
+    {...props}
+  />
 ))
 CardDescription.displayName = 'CardDescription'
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-5 pt-0', className)} {...props} />
+    <div ref={ref} className={cn('p-5 pt-0 text-[var(--color-ink)]', className)} {...props} />
   ),
 )
 CardContent.displayName = 'CardContent'
@@ -52,4 +64,11 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 )
 CardFooter.displayName = 'CardFooter'
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+}

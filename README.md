@@ -58,6 +58,18 @@ Single Vercel deployment
 **Symptom:** Webpack build error — `'activeAnimations' is not exported from 'motion-dom'`
 **Fix:** Removed `framer-motion` dep entirely. Panel transitions use CSS `@keyframes editorial-fade-in` (400ms ease) with `fade-in` class. Removed `motion.div` + `AnimatePresence` from `page.tsx`
 
+### #8 · Bug: dark/light theme mismatch across all panels
+**Symptom:** Light mode showed panels with hardcoded dark colors (`bg-[#0d1220]`, `border-white/5`, `text-red-400`) — UI primitives and 12 panels stayed dark in light mode. Hype Predictor also had overlapping number/text layout.
+**Root cause:**
+1. UI primitives (`Card`, `Button`, `Badge`, `Input`, `Select`, `Separator`, `Tabs`, `Progress`) had hardcoded dark Tailwind classes — never responded to `[data-theme="light"]` overrides
+2. 12 panels (FX Volatility, Hype Predictor, Launch Conflicts, Stock-Out Risk, Competitive Matrix, Runway Tracker, VIP Tier Simulator, Sustainability, Trend Forecast, Drop Queue, Watchlist, Alerts, Optimizer) only got color VARIABLE migration, not full redesign — they still wrapped content in `<Card>` with old layout
+**Fix:**
+- Updated all 8 UI primitives to use `var(--color-*)` instead of hardcoded Tailwind classes
+- Added missing `--color-warning-soft` CSS variable (both modes)
+- Fully redesigned 11 remaining panels with `PanelShell` + editorial layout
+- Hype Predictor: fixed overlapping "77" hype number vs "TOP HYPED LAUNCH RATING" badge — now uses hero-num layout with explicit column grid
+- Verified: 0 occurrences of hardcoded `bg-[#0d1220]`, `bg-white/5`, `text-red-400` in compiled HTML
+
 ### #7 · Redesign: editorial aesthetic + dark/light theme
 **Motivation:** "AI slop dashboard" — emoji icons, rainbow palettes, repeated card grids, no typography hierarchy
 **Direction:** editorial-meets-terminal — *FT.com* layout + *Bloomberg Terminal* density + *Linear/Hermès* restraint

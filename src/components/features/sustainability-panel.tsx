@@ -10,11 +10,8 @@ import {
   Radar,
   Tooltip,
 } from 'recharts'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
+import { PanelShell, ChartTooltip } from '@/components/ui/panel-shell'
 import { getSustainability } from '@/lib/analytics'
-import { Leaf } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const BRAND_COLORS: Record<string, string> = {
   Prada: '#a855f7',
@@ -28,43 +25,45 @@ export function SustainabilityPanel() {
   const metrics = useMemo(() => getSustainability(), [])
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>
-            <Leaf className="size-4 text-[var(--color-positive)]" />
-            Sustainability Scores
-          </CardTitle>
-          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-            2025 ESG report · carbon, materials, supply, circularity, labor
-          </p>
+    <PanelShell
+      category="Luxury"
+      title="Sustainability Scores"
+      subtitle="ESG report 2025 · carbon, materials, supply, circularity, labor"
+      caption="Composite sustainability scores per maison. Higher = better ESG performance."
+    >
+      {/* KPI strip */}
+      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-5">
+        {metrics.map((m) => (
+          <div key={m.brandId}>
+            <div className="label mb-1">{m.brand}</div>
+            <div className="hero-num text-[28px] tabular-nums" style={{ color: BRAND_COLORS[m.brand] }}>
+              {m.overallScore}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Per-brand grid */}
+      <section>
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label">Per-dimension detail</div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
           {metrics.map((m) => {
-            const color = BRAND_COLORS[m.brand] || '#10b981'
+            const color = BRAND_COLORS[m.brand] || 'var(--color-accent)'
             return (
-              <div
-                key={m.brandId}
-                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-base font-semibold text-[var(--color-ink)]">{m.brand}</div>
-                    <div className="text-[10px] text-[var(--color-ink-muted)]">FY {m.reportYear}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold" style={{ color }}>
-                      {m.overallScore}
-                    </div>
-                    <div className="text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
-                      Overall
-                    </div>
-                  </div>
+              <article key={m.brandId} className="bg-[var(--color-bg)] p-5">
+                <div className="mb-3 flex items-baseline justify-between">
+                  <h4 className="font-display text-[18px] font-medium tracking-tight text-[var(--color-ink)]">
+                    {m.brand}
+                  </h4>
+                  <span className="font-mono text-[20px] tabular-nums" style={{ color }}>
+                    {m.overallScore}
+                  </span>
                 </div>
-                <div className="h-32">
-                  <ResponsiveContainer>
+                <div className="h-44">
+                  <ResponsiveContainer width="100%" height="100%">
                     <RadarChart
                       data={[
                         { axis: 'Carbon', value: m.carbonScore },
@@ -74,58 +73,55 @@ export function SustainabilityPanel() {
                         { axis: 'Labor', value: m.laborPracticeScore },
                       ]}
                     >
-                      <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                      <PolarAngleAxis dataKey="axis" stroke="rgba(255,255,255,0.5)" fontSize={9} />
-                      <PolarRadiusAxis stroke="rgba(255,255,255,0.2)" fontSize={8} domain={[0, 100]} />
+                      <PolarGrid stroke="var(--color-border)" />
+                      <PolarAngleAxis
+                        dataKey="axis"
+                        stroke="var(--color-ink-muted)"
+                        fontSize={10}
+                        tick={{ fill: 'var(--color-ink-muted)' }}
+                      />
+                      <PolarRadiusAxis
+                        stroke="var(--color-ink-faint)"
+                        fontSize={9}
+                        domain={[0, 100]}
+                        tick={false}
+                        axisLine={false}
+                      />
                       <Radar
                         name={m.brand}
                         dataKey="value"
                         stroke={color}
                         fill={color}
-                        fillOpacity={0.3}
+                        fillOpacity={0.18}
+                        strokeWidth={1.5}
                       />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#0d1220',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: 6,
-                          fontSize: 10,
-                        }}
-                      />
+                      <Tooltip content={<ChartTooltip />} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-3 space-y-1.5 text-[11px]">
-                  <Bar label="Carbon" value={m.carbonScore} />
-                  <Bar label="Materials" value={m.materialSourcing} />
-                  <Bar label="Supply" value={m.supplyChainTransparency} />
-                  <Bar label="Circular" value={m.circularityIndex} />
-                  <Bar label="Labor" value={m.laborPracticeScore} />
+                <div className="mt-3 grid grid-cols-5 gap-px border-t border-[var(--color-border)] pt-3">
+                  {[
+                    { label: 'C', value: m.carbonScore },
+                    { label: 'M', value: m.materialSourcing },
+                    { label: 'S', value: m.supplyChainTransparency },
+                    { label: 'R', value: m.circularityIndex },
+                    { label: 'L', value: m.laborPracticeScore },
+                  ].map((d) => (
+                    <div key={d.label} className="text-center">
+                      <div className="font-mono text-[12px] tabular-nums text-[var(--color-ink)]">
+                        {d.value}
+                      </div>
+                      <div className="mt-0.5 text-[9px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
+                        {d.label}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              </article>
             )
           })}
         </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function Bar({ label, value }: { label: string; value: number }) {
-  const color = value >= 75 ? '#10b981' : value >= 50 ? '#f59e0b' : '#ef4444'
-  return (
-    <div>
-      <div className="mb-0.5 flex justify-between">
-        <span className="text-[var(--color-ink-muted)]">{label}</span>
-        <span className="font-mono text-[var(--color-ink)]">{value}</span>
-      </div>
-      <Progress value={value} indicatorClassName="" className="h-1" />
-      <div className="mt-[-3px] h-0.5">
-        <div
-          className="h-1 rounded-full"
-          style={{ width: `${value}%`, backgroundColor: color }}
-        />
-      </div>
-    </div>
+      </section>
+    </PanelShell>
   )
 }
