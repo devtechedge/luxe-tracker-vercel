@@ -640,7 +640,7 @@ export function getVIPSimulation(brandIdx: number, annualSpendEUR: number): VIPS
   const brandId = `brand_${brandIdx}`
   const tiers = snap.vipTierDefs.map((t) => ({
     ...t,
-    achievable: annualSpendEUR >= t.minSpend,
+    achievable: annualSpendEUR >= t.minAnnualSpendEUR,
   }))
   const qualified = tiers.filter((t) => t.achievable).pop()
   const nextTier = tiers.find((t) => !t.achievable)
@@ -660,8 +660,8 @@ export function getVIPSimulation(brandIdx: number, annualSpendEUR: number): VIPS
     nextTier: nextTier
       ? {
           tierName: nextTier.tierName,
-          minAnnualSpendEUR: nextTier.minSpend,
-          gapEUR: nextTier.minSpend - annualSpendEUR,
+          minAnnualSpendEUR: nextTier.minAnnualSpendEUR,
+          gapEUR: nextTier.minAnnualSpendEUR - annualSpendEUR,
         }
       : null,
     allTiers: tiers,

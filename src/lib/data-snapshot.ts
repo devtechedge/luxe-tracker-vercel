@@ -401,14 +401,16 @@ function generateSustainability() {
 // VIP Tiers (per brand, 4 tiers each)
 // ------------------------------------------------------------
 function generateVIPTiers() {
-  const tiers: VIPTierData[] = []
-  const tierDefs = [
-    { name: 'Silver', minSpend: 5000, discount: 5, earlyAccess: 0, priority: 2, viewing: false, shopper: false },
-    { name: 'Gold', minSpend: 15000, discount: 10, earlyAccess: 3, priority: 3, viewing: true, shopper: false },
-    { name: 'Platinum', minSpend: 40000, discount: 15, earlyAccess: 7, priority: 4, viewing: true, shopper: true },
-    { name: 'Diamond', minSpend: 100000, discount: 22, earlyAccess: 14, priority: 5, viewing: true, shopper: true },
+  // Property names match the VIPTierData interface used by analytics.ts
+  // and vip-panel.tsx — was a bug where the original used shorthand
+  // names (name/minSpend/discount) that didn't match the schema.
+  const tierDefs: VIPTierData[] = [
+    { tierName: 'Silver',   minAnnualSpendEUR: 5000,   discountPct: 5,  earlyAccessDays: 0,  allocationPriority: 2, privateViewing: false, personalShopper: false, achievable: false },
+    { tierName: 'Gold',     minAnnualSpendEUR: 15000,  discountPct: 10, earlyAccessDays: 3,  allocationPriority: 3, privateViewing: true,  personalShopper: false, achievable: false },
+    { tierName: 'Platinum', minAnnualSpendEUR: 40000,  discountPct: 15, earlyAccessDays: 7,  allocationPriority: 4, privateViewing: true,  personalShopper: true,  achievable: false },
+    { tierName: 'Diamond',  minAnnualSpendEUR: 100000, discountPct: 22, earlyAccessDays: 14, allocationPriority: 5, privateViewing: true,  personalShopper: true,  achievable: false },
   ]
-  return { tierDefs, tiers }
+  return { tierDefs }
 }
 
 // ------------------------------------------------------------
@@ -501,7 +503,7 @@ function buildSnapshot() {
   const currencyData = generateCurrencyData()
   const runwayShows = generateRunwayShows()
   const sustainability = generateSustainability()
-  const { tierDefs, tiers: _vipTiers } = generateVIPTiers()
+  const { tierDefs } = generateVIPTiers()
   const trends = generateTrends()
   const dropQueue = generateDropQueue(products)
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { ComponentType } from 'react'
 import {
   Activity,
   Globe,
@@ -15,7 +16,6 @@ import {
   Crown,
   Sparkles,
   Leaf,
-  Heart,
   Bell,
   Zap,
   Heart as HeartIcon,
@@ -65,7 +65,7 @@ type PanelId =
 interface NavItem {
   id: PanelId
   label: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   category: 'Intelligence' | 'Pricing' | 'Market' | 'Luxury' | 'Personal'
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,7 +23,7 @@ const RISK_COLORS: Record<string, 'destructive' | 'warning' | 'success'> = {
 
 export function FxVolatility() {
   const data = useMemo(() => getVolatility(), [])
-  const [featuredIdx, setFeaturedIdx] = React.useState(0)
+  const [featuredIdx, setFeaturedIdx] = useState(0)
   const featured = data.pairs[featuredIdx] || data.pairs[0]
 
   return (
@@ -138,5 +138,3 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
     </div>
   )
 }
-
-import React from 'react'

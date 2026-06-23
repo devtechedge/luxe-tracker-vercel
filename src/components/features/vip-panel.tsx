@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -165,7 +166,7 @@ export function VipPanel() {
   )
 }
 
-function Benefit({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Benefit({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-md border border-white/5 bg-white/[0.02] p-2">
       <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-gray-500">
