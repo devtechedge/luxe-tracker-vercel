@@ -37,9 +37,9 @@ export function HypePredictor() {
       {featured && (
         <section className="mb-12">
           <div className="rule" />
-          <div className="grid grid-cols-1 gap-10 py-8 lg:grid-cols-[minmax(0,1fr),minmax(0,360px)] lg:divide-x lg:divide-[var(--color-border)]">
+          <div className="grid grid-cols-1 gap-8 py-5 lg:grid-cols-[1fr,300px]">
             {/* Left: text content */}
-            <div className="lg:pr-10">
+            <div>
               <div className="label mb-3">Top Hyped · {featured.brand}</div>
               <h3 className="font-display text-[26px] font-medium leading-[1.15] tracking-tight text-[var(--color-ink)]">
                 {featured.productName}
@@ -94,9 +94,9 @@ export function HypePredictor() {
             </div>
 
             {/* Right: radar chart in its own column */}
-            <div className="lg:pl-10">
+            <div className="lg:border-l lg:border-[var(--color-border)] lg:pl-8">
               <div className="label mb-3">5-Dimension Profile</div>
-              <div className="h-64">
+              <div className="h-[260px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart
                     data={[
@@ -140,46 +140,43 @@ export function HypePredictor() {
       )}
 
       {/* === CATEGORY FILTER === */}
-      <section className="mb-4">
-        <div className="rule" />
-        <div className="flex items-center justify-between py-3">
-          <div className="flex flex-wrap items-center gap-1">
-            <span className="mr-2 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-              Filter
-            </span>
+      <div className="mb-4 flex items-center justify-between border-b border-[var(--color-border)]">
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="mr-2 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+            Filter
+          </span>
+          <button
+            onClick={() => setCategory('all')}
+            className={`rounded px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+              category === 'all'
+                ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
+                : 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-ink)]'
+            }`}
+          >
+            All
+          </button>
+          {categories.map((c) => (
             <button
-              onClick={() => setCategory('all')}
+              key={c}
+              onClick={() => setCategory(c)}
               className={`rounded px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] transition-colors ${
-                category === 'all'
+                category === c
                   ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
                   : 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-ink)]'
               }`}
             >
-              All
+              {c}
             </button>
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`rounded px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] transition-colors ${
-                  category === c
-                    ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
-                    : 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-ink)]'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-subtle)]">
-            {filtered.length} products
-          </span>
+          ))}
         </div>
-      </section>
+        <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-subtle)]">
+          {filtered.length} products
+        </span>
+      </div>
 
       {/* === HYPED GRID — explicit fixed-height cards, no overlap possible === */}
       <section>
-        <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, 12).map((p) => (
             <article
               key={p.productId}

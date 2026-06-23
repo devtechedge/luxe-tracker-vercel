@@ -16,7 +16,7 @@ export function StockRisk() {
       caption="Sell-out probability based on inventory fill, hype score, and time to launch. Earlier intervention saves revenue."
     >
       {/* KPI strip */}
-      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
         <div>
           <div className="label mb-1">Tracked SKUs</div>
           <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.totalEntries}</div>
@@ -42,7 +42,7 @@ export function StockRisk() {
       {/* Top risks list */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Top risk items</div>
         </div>
         <div className="space-y-px">

@@ -76,7 +76,7 @@ export function LaunchCalendar() {
             return (
               <div
                 key={l.id}
-                className="grid grid-cols-[80px,1fr,120px,80px] gap-4 border-b border-[var(--color-border)] py-3 data-row"
+                className="grid grid-cols-[80px,1fr,120px,80px] gap-4 border-b border-[var(--color-border)] py-4 data-row"
               >
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">

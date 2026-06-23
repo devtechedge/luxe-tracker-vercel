@@ -26,7 +26,7 @@ export function LaunchConflicts() {
       caption="Identifies overlapping drop windows that cannibalize demand. Brighter bars = higher launch density in that week."
     >
       {/* KPI strip */}
-      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
         <div>
           <div className="label mb-1">Total conflicts</div>
           <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.totalConflicts}</div>
@@ -48,10 +48,10 @@ export function LaunchConflicts() {
       {/* Weekly density chart */}
       <section className="mb-10">
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Weekly launch density</div>
         </div>
-        <div className="h-64">
+        <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.weeklyDensity} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
@@ -67,14 +67,14 @@ export function LaunchConflicts() {
       {/* Conflict days list */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Conflict days</div>
         </div>
         <div className="space-y-px">
           {data.conflictDays.slice(0, 8).map((day) => (
             <article
               key={day.date}
-              className="flex items-baseline justify-between gap-4 border-b border-[var(--color-border)] py-3 transition-colors hover:bg-[var(--color-surface)]"
+              className="flex items-baseline justify-between gap-4 border-b border-[var(--color-border)] py-4 transition-colors hover:bg-[var(--color-surface)]"
             >
               <div className="flex items-baseline gap-4">
                 <span className="font-mono text-[12px] tabular-nums text-[var(--color-ink)]">{day.date}</span>

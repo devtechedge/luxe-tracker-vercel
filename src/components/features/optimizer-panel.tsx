@@ -31,7 +31,7 @@ export function OptimizerPanel() {
     >
       <section className="mb-8">
         <div className="rule" />
-        <div className="grid grid-cols-1 gap-6 py-6 md:grid-cols-[1fr,300px]">
+        <div className="grid grid-cols-1 gap-8 py-5 lg:grid-cols-[1fr,300px]">
           <div>
             <label className="mb-2 block label">Product</label>
             <select
@@ -68,7 +68,7 @@ export function OptimizerPanel() {
       {/* Best route highlight */}
       <section className="mb-8">
         <div className="rule" />
-        <div className="grid grid-cols-1 gap-8 py-6 md:grid-cols-[1fr,1fr]">
+        <div className="grid grid-cols-1 gap-8 py-5 md:grid-cols-[1fr,1fr]">
           <div>
             <div className="label mb-1">Best route</div>
             <div className="mt-1 flex items-baseline gap-3">
@@ -104,7 +104,7 @@ export function OptimizerPanel() {
       {/* All routes table */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">All routes compared</div>
         </div>
         <table className="w-full text-[12px] tabular-nums">

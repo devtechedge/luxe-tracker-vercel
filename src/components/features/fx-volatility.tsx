@@ -33,7 +33,7 @@ export function FxVolatility() {
       caption="Range, volatility, and risk score per currency pair. Higher volatility = greater exposure to FX swings."
     >
       {/* KPI strip */}
-      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
         {data.pairs.slice(0, 4).map((p) => (
           <button
             key={p.pair}
@@ -101,7 +101,7 @@ export function FxVolatility() {
             </div>
           </div>
 
-          <div className="flex flex-col justify-center border-l border-[var(--color-border)] pl-8">
+          <div className="flex flex-col justify-center lg:border-l lg:border-[var(--color-border)] lg:pl-8">
             <div className="label">90-day change</div>
             <div
               className="hero-num mt-1 text-[64px]"

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { ComponentType } from 'react'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Menu, X } from 'lucide-react'
 
 import { TelemetryOverview } from '@/components/features/telemetry-overview'
 import { PriceMatrix } from '@/components/features/price-matrix'
@@ -75,6 +75,7 @@ const NAV: NavItem[] = [
 
 export default function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelId>('overview')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const { theme, toggle, hydrated } = useTheme()
 
   const grouped = NAV.reduce<Record<string, NavItem[]>>((acc, item) => {
@@ -84,90 +85,76 @@ export default function Dashboard() {
 
   const activeItem = NAV.find((n) => n.id === activePanel)
 
+  function handleNav(id: PanelId) {
+    setActivePanel(id)
+    setMobileNavOpen(false)
+  }
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex max-w-[1500px] gap-0">
         {/* ============================================================ */}
-        {/* SIDEBAR — refined, typographic                                */}
+        {/* SIDEBAR — desktop (sticky) + mobile (slide-over drawer)       */}
         {/* ============================================================ */}
         <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:block">
-          <div className="flex h-full flex-col">
-            {/* Brand mark */}
-            <div className="px-6 pt-7 pb-6">
-              <div className="flex items-baseline gap-2">
-                <span className="font-display text-xl font-medium tracking-tight text-[var(--color-ink)]">
-                  Luxe
-                </span>
-                <span className="font-display text-xl font-medium tracking-tight text-[var(--color-accent)]">
-                  Tracker
-                </span>
-              </div>
-              <p className="mt-1.5 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-                Global Intelligence · v3.0
-              </p>
-            </div>
-
-            <div className="rule mx-6" />
-
-            {/* Nav */}
-            <nav className="flex-1 overflow-y-auto px-3 py-5">
-              {Object.entries(grouped).map(([category, items]) => (
-                <div key={category} className="mb-5">
-                  <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
-                    {category}
-                  </div>
-                  <ul className="space-y-px">
-                    {items.map((item) => {
-                      const isActive = activePanel === item.id
-                      return (
-                        <li key={item.id}>
-                          <button
-                            onClick={() => setActivePanel(item.id)}
-                            className={`group flex w-full items-center justify-between gap-2 rounded px-3 py-1.5 text-left text-[13px] transition-colors ${
-                              isActive
-                                ? 'bg-[var(--color-surface-2)] text-[var(--color-ink)]'
-                                : 'text-[var(--color-ink-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]'
-                            }`}
-                          >
-                            <span>{item.label}</span>
-                            {isActive && (
-                              <span className="size-1 rounded-full bg-[var(--color-accent)]" />
-                            )}
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </nav>
-
-            {/* Footer */}
-            <div className="border-t border-[var(--color-border)] px-6 py-4">
-              <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
-                Build
-              </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-ink-subtle)]">
-                Static snapshot · Vercel-only · Watchlist stored locally
-              </p>
-            </div>
-          </div>
+          <SidebarContent grouped={grouped} activePanel={activePanel} onNav={handleNav} />
         </aside>
+
+        {/* Mobile sidebar overlay */}
+        {mobileNavOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMobileNavOpen(false)}
+            />
+            <aside className="relative flex h-full w-[280px] flex-col bg-[var(--color-bg)] shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-xl font-medium tracking-tight text-[var(--color-ink)]">
+                    Luxe
+                  </span>
+                  <span className="font-display text-xl font-medium tracking-tight text-[var(--color-accent)]">
+                    Tracker
+                  </span>
+                </div>
+                <button
+                  onClick={() => setMobileNavOpen(false)}
+                  className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <SidebarContent grouped={grouped} activePanel={activePanel} onNav={handleNav} />
+              </div>
+            </aside>
+          </div>
+        )}
 
         {/* ============================================================ */}
         {/* MAIN CONTENT                                                  */}
         {/* ============================================================ */}
         <main className="min-w-0 flex-1">
           {/* TOP BAR */}
-          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 px-8 py-4 backdrop-blur-md">
-            <div className="flex items-baseline gap-3">
-              <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-                {activeItem?.category ?? 'Luxe'}
-              </span>
-              <span className="text-[var(--color-ink-faint)]">/</span>
-              <h1 className="font-display text-base font-medium tracking-tight text-[var(--color-ink)]">
-                {activeItem?.label ?? 'Overview'}
-              </h1>
+          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 px-4 py-4 backdrop-blur-md md:px-8">
+            <div className="flex items-center gap-3">
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setMobileNavOpen(true)}
+                className="lg:hidden text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                aria-label="Open navigation"
+              >
+                <Menu className="size-5" />
+              </button>
+              <div className="flex items-baseline gap-3">
+                <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  {activeItem?.category ?? 'Luxe'}
+                </span>
+                <span className="text-[var(--color-ink-faint)]">/</span>
+                <h1 className="font-display text-base font-medium tracking-tight text-[var(--color-ink)]">
+                  {activeItem?.label ?? 'Overview'}
+                </h1>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -175,34 +162,111 @@ export default function Dashboard() {
             </div>
           </header>
 
-          {/* PANEL CONTENT */}
-          <div key={activePanel} className="fade-in px-8 py-8">
-              {activePanel === 'overview' && <TelemetryOverview />}
-              {activePanel === 'price-matrix' && <PriceMatrix />}
-              {activePanel === 'launch-calendar' && <LaunchCalendar />}
-              {activePanel === 'arbitrage' && <ArbitragePanel />}
-              {activePanel === 'optimizer' && <OptimizerPanel />}
-              {activePanel === 'price-history' && <PriceHistory />}
-              {activePanel === 'fx-volatility' && <FxVolatility />}
-              {activePanel === 'hype-predictor' && <HypePredictor />}
-              {activePanel === 'launch-conflicts' && <LaunchConflicts />}
-              {activePanel === 'stock-risk' && <StockRisk />}
-              {activePanel === 'competitive-matrix' && <CompetitiveMatrix />}
-              {activePanel === 'brand-pulse' && <BrandPulse />}
-              {activePanel === 'runway' && <RunwayPanel />}
-              {activePanel === 'vip-tier' && <VipPanel />}
-              {activePanel === 'sustainability' && <SustainabilityPanel />}
-              {activePanel === 'trend-forecast' && <TrendForecastPanel />}
-              {activePanel === 'drop-queue' && <DropQueuePanel />}
-              {activePanel === 'watchlist' && (
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                  <WatchlistPanel />
-                  <AlertsPanel />
-                </div>
-              )}
-              {activePanel === 'alerts' && <AlertsPanel />}
-      </div>
+          {/* PANEL CONTENT — responsive horizontal padding */}
+          <div key={activePanel} className="fade-in px-4 py-6 md:px-8 md:py-8">
+            {activePanel === 'overview' && <TelemetryOverview />}
+            {activePanel === 'price-matrix' && <PriceMatrix />}
+            {activePanel === 'launch-calendar' && <LaunchCalendar />}
+            {activePanel === 'arbitrage' && <ArbitragePanel />}
+            {activePanel === 'optimizer' && <OptimizerPanel />}
+            {activePanel === 'price-history' && <PriceHistory />}
+            {activePanel === 'fx-volatility' && <FxVolatility />}
+            {activePanel === 'hype-predictor' && <HypePredictor />}
+            {activePanel === 'launch-conflicts' && <LaunchConflicts />}
+            {activePanel === 'stock-risk' && <StockRisk />}
+            {activePanel === 'competitive-matrix' && <CompetitiveMatrix />}
+            {activePanel === 'brand-pulse' && <BrandPulse />}
+            {activePanel === 'runway' && <RunwayPanel />}
+            {activePanel === 'vip-tier' && <VipPanel />}
+            {activePanel === 'sustainability' && <SustainabilityPanel />}
+            {activePanel === 'trend-forecast' && <TrendForecastPanel />}
+            {activePanel === 'drop-queue' && <DropQueuePanel />}
+            {activePanel === 'watchlist' && (
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                <WatchlistPanel />
+                <AlertsPanel />
+              </div>
+            )}
+            {activePanel === 'alerts' && <AlertsPanel />}
+          </div>
         </main>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// SIDEBAR CONTENT — shared between desktop and mobile drawer
+// ============================================================
+function SidebarContent({
+  grouped,
+  activePanel,
+  onNav,
+}: {
+  grouped: Record<string, NavItem[]>
+  activePanel: PanelId
+  onNav: (id: PanelId) => void
+}) {
+  return (
+    <div className="flex h-full flex-col">
+      {/* Brand mark — desktop only (mobile has its own) */}
+      <div className="px-6 pt-7 pb-6 hidden lg:block">
+        <div className="flex items-baseline gap-2">
+          <span className="font-display text-xl font-medium tracking-tight text-[var(--color-ink)]">
+            Luxe
+          </span>
+          <span className="font-display text-xl font-medium tracking-tight text-[var(--color-accent)]">
+            Tracker
+          </span>
+        </div>
+        <p className="mt-1.5 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+          Global Intelligence · v3.1
+        </p>
+      </div>
+
+      <div className="rule mx-6 hidden lg:block" />
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-5 lg:py-5 pt-2 lg:pt-5">
+        {Object.entries(grouped).map(([category, items]) => (
+          <div key={category} className="mb-5">
+            <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+              {category}
+            </div>
+            <ul className="space-y-px">
+              {items.map((item) => {
+                const isActive = activePanel === item.id
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => onNav(item.id)}
+                      className={`group flex w-full items-center justify-between gap-2 rounded px-3 py-1.5 text-left text-[13px] transition-colors ${
+                        isActive
+                          ? 'bg-[var(--color-surface-2)] text-[var(--color-ink)]'
+                          : 'text-[var(--color-ink-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]'
+                      }`}
+                    >
+                      <span>{item.label}</span>
+                      {isActive && (
+                        <span className="size-1 rounded-full bg-[var(--color-accent)]" />
+                      )}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+
+      {/* Footer */}
+      <div className="border-t border-[var(--color-border)] px-6 py-4">
+        <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+          Build
+        </div>
+        <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-ink-subtle)]">
+          Static snapshot · Vercel-only · Watchlist stored locally
+        </p>
       </div>
     </div>
   )

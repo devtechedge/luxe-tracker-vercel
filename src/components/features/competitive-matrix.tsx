@@ -44,10 +44,10 @@ export function CompetitiveMatrix() {
     >
       <section className="mb-8">
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">EU price by category × brand</div>
         </div>
-        <div className="h-72">
+        <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
@@ -75,12 +75,12 @@ export function CompetitiveMatrix() {
 
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">By category</div>
         </div>
         <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
           {data.categories.map((cat) => (
-            <article key={cat.category} className="bg-[var(--color-bg)] p-4">
+            <article key={cat.category} className="bg-[var(--color-bg)] p-4 transition-colors hover:bg-[var(--color-surface)]">
               <div className="mb-3 flex items-baseline justify-between">
                 <h4 className="font-display text-[15px] font-medium tracking-tight text-[var(--color-ink)]">
                   {cat.category}

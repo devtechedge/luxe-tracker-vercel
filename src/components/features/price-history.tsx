@@ -15,6 +15,7 @@ import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { getPriceHistory } from '@/lib/analytics'
 import { getSnapshot } from '@/lib/data-snapshot'
 import { fmtPct } from '@/lib/utils'
+import { PanelShell } from '@/components/ui/panel-shell'
 
 export function PriceHistory() {
   const data = useMemo(() => getPriceHistory(), [])
@@ -37,20 +38,11 @@ export function PriceHistory() {
   }, [data, snap, featuredIdx])
 
   return (
-    <div className="fade-in">
-      {/* HEADER */}
-      <header className="mb-6">
-        <div className="label label-accent mb-1">Pricing</div>
-        <h2 className="font-display text-[28px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
-          Price History & Trend Charts
-        </h2>
-        <p className="mt-1 text-[13px] text-[var(--color-ink-muted)]">
-          90-day daily series · {data.totalSeries} tracked combinations ·{' '}
-          <span className="text-[var(--color-accent)]">{data.totalAnomalies} anomalies</span>{' '}
-          (≥3% daily moves)
-        </p>
-      </header>
-
+    <PanelShell
+      category="Pricing"
+      title="Price History & Trend Charts"
+      subtitle={`90-day daily series · ${data.totalSeries} tracked combinations · ${data.totalAnomalies} anomalies (≥3% daily moves)`}
+    >
       {/* FEATURED CHART */}
       {featuredSeries && (
         <section className="mb-8">
@@ -117,11 +109,11 @@ export function PriceHistory() {
               </div>
             </div>
 
-            {/* Headline metric */}
-            <div className="flex flex-col justify-center border-l border-[var(--color-border)] pl-8 lg:border-l lg:pl-8">
+            {/* Headline metric — border-l only on lg+ */}
+            <div className="flex flex-col justify-center lg:border-l lg:border-[var(--color-border)] lg:pl-8">
               <div className="label">90-day change</div>
               <div
-                className={`hero-num mt-2 text-[64px] ${
+                className={`hero-num mt-2 text-[48px] md:text-[56px] lg:text-[64px] ${
                   featuredSeries.change90dPct >= 0
                     ? 'text-[var(--color-negative)]'
                     : 'text-[var(--color-positive)]'
@@ -129,7 +121,7 @@ export function PriceHistory() {
               >
                 {featuredSeries.change90dPct >= 0 ? '+' : ''}
                 {featuredSeries.change90dPct.toFixed(1)}
-                <span className="text-[36px]">%</span>
+                <span className="text-[28px] md:text-[32px] lg:text-[36px]">%</span>
               </div>
               <div className="mt-3 flex items-center gap-2 text-[12px] text-[var(--color-ink-muted)]">
                 {featuredSeries.change90dPct >= 0 ? (
@@ -185,58 +177,60 @@ export function PriceHistory() {
       {/* TOP MOVERS TABLE */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label mb-2">Top Movers</div>
         </div>
-        <table className="w-full text-[12px] tabular-nums">
-          <thead>
-            <tr className="border-b border-[var(--color-border)]">
-              <th className="py-2 text-left"><span className="label">Product</span></th>
-              <th className="px-3 text-left"><span className="label">Region</span></th>
-              <th className="px-3 text-right"><span className="label">Start</span></th>
-              <th className="px-3 text-right"><span className="label">Now</span></th>
-              <th className="px-3 text-right"><span className="label">90d</span></th>
-              <th className="px-3 text-right"><span className="label">Anomalies</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.topMovers.slice(0, 15).map((m, i) => (
-              <tr
-                key={`${m.productId}-${m.region}`}
-                className={`border-b border-[var(--color-border)] data-row ${
-                  i % 2 === 1 ? 'bg-[var(--color-surface)]' : ''
-                }`}
-              >
-                <td className="py-2.5">
-                  <div className="text-[var(--color-ink)]">{m.productName}</div>
-                  <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
-                    {m.brand}
-                  </div>
-                </td>
-                <td className="px-3 text-[var(--color-ink-muted)]">{m.region}</td>
-                <td className="px-3 text-right font-mono text-[var(--color-ink-muted)]">
-                  {m.startPrice.toFixed(0)}
-                </td>
-                <td className="px-3 text-right font-mono text-[var(--color-ink)]">
-                  {m.endPrice.toFixed(0)}
-                </td>
-                <td
-                  className={`px-3 text-right font-mono ${
-                    m.change90dPct > 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] text-[12px] tabular-nums">
+            <thead>
+              <tr className="border-b border-[var(--color-border)]">
+                <th className="py-2 text-left"><span className="label">Product</span></th>
+                <th className="px-3 text-left"><span className="label">Region</span></th>
+                <th className="px-3 text-right"><span className="label">Start</span></th>
+                <th className="px-3 text-right"><span className="label">Now</span></th>
+                <th className="px-3 text-right"><span className="label">90d</span></th>
+                <th className="px-3 text-right"><span className="label">Anomalies</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.topMovers.slice(0, 15).map((m, i) => (
+                <tr
+                  key={`${m.productId}-${m.region}`}
+                  className={`border-b border-[var(--color-border)] data-row ${
+                    i % 2 === 1 ? 'bg-[var(--color-surface)]' : ''
                   }`}
                 >
-                  {fmtPct(m.change90dPct)}
-                </td>
-                <td className="px-3 text-right font-mono text-[var(--color-accent)]">
-                  {m.anomalyCount}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <td className="py-2.5">
+                    <div className="text-[var(--color-ink)]">{m.productName}</div>
+                    <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
+                      {m.brand}
+                    </div>
+                  </td>
+                  <td className="px-3 text-[var(--color-ink-muted)]">{m.region}</td>
+                  <td className="px-3 text-right font-mono text-[var(--color-ink-muted)]">
+                    {m.startPrice.toFixed(0)}
+                  </td>
+                  <td className="px-3 text-right font-mono text-[var(--color-ink)]">
+                    {m.endPrice.toFixed(0)}
+                  </td>
+                  <td
+                    className={`px-3 text-right font-mono ${
+                      m.change90dPct > 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'
+                    }`}
+                  >
+                    {fmtPct(m.change90dPct)}
+                  </td>
+                  <td className="px-3 text-right font-mono text-[var(--color-accent)]">
+                    {m.anomalyCount}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div className="rule mt-1" />
       </section>
-    </div>
+    </PanelShell>
   )
 }
 

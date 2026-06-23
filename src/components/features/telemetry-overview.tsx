@@ -11,8 +11,9 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { getTelemetry } from '@/lib/analytics'
-import { fmtEUR, fmtNum, fmtPct } from '@/lib/utils'
+import { fmtNum } from '@/lib/utils'
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { PanelShell, ChartPanel, EditorialTooltip } from '@/components/ui/panel-shell'
 
 export function TelemetryOverview() {
   const data = useMemo(() => getTelemetry(), [])
@@ -34,23 +35,20 @@ export function TelemetryOverview() {
   const rates = data.currencyRates.slice(0, 4)
 
   return (
-    <div className="fade-in">
+    <PanelShell
+      category="Intelligence"
+      title="Live Telemetry"
+      subtitle="Updated every second"
+    >
       {/* ============================================================ */}
       {/* HERO — editorial metric strip                                  */}
       {/* ============================================================ */}
-      <section className="pb-10">
-        <div className="mb-3 flex items-baseline gap-3">
-          <span className="label label-accent">Live Telemetry</span>
-          <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
-            Updated every second
-          </span>
-        </div>
-
+      <section className="pb-5">
         {/* Massive headline number — the hero metric */}
         <div className="mb-8 flex items-baseline gap-4">
-          <span className="hero-num text-[80px] text-[var(--color-ink)]">
+          <span className="hero-num text-[48px] text-[var(--color-ink)] md:text-[64px] lg:text-[80px]">
             {o.maxDisparityOverall.toFixed(1)}
-            <span className="text-[44px] text-[var(--color-ink-subtle)]">%</span>
+            <span className="text-[28px] text-[var(--color-ink-subtle)] md:text-[36px] lg:text-[44px]">%</span>
           </span>
           <div className="pb-3">
             <div className="label">Maximum Markup vs EU</div>
@@ -62,7 +60,8 @@ export function TelemetryOverview() {
         </div>
 
         {/* Metric grid — 8 columns of typographic numbers */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-[var(--color-border)] pt-6 md:grid-cols-4 lg:grid-cols-8">
+        <div className="rule" />
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 py-5 md:grid-cols-4 lg:grid-cols-8">
           {metrics.map((m) => (
             <div key={m.label}>
               <div className="label mb-1">{m.label}</div>
@@ -87,7 +86,8 @@ export function TelemetryOverview() {
         </div>
 
         {/* Currency rates — inline data strip */}
-        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-[var(--color-border)] pt-5">
+        <div className="rule" />
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-2 py-5">
           <span className="label">FX Rates</span>
           {rates.map((r) => (
             <div key={r.pair} className="flex items-baseline gap-2">
@@ -105,7 +105,8 @@ export function TelemetryOverview() {
       {/* ============================================================ */}
       {/* DATA SECTION — typography-first, minimal chrome                */}
       {/* ============================================================ */}
-      <section className="grid grid-cols-1 gap-8 border-t border-[var(--color-border)] pt-10 lg:grid-cols-2">
+      <div className="rule" />
+      <section className="grid grid-cols-1 gap-8 py-5 lg:grid-cols-2">
         <ChartPanel
           label="By Region"
           title="Markup vs EU baseline, by region"
@@ -168,55 +169,6 @@ export function TelemetryOverview() {
           </ResponsiveContainer>
         </ChartPanel>
       </section>
-    </div>
-  )
-}
-
-// ============================================================
-// CHART PANEL — minimal editorial wrapper
-// ============================================================
-function ChartPanel({
-  label,
-  title,
-  caption,
-  children,
-}: {
-  label: string
-  title: string
-  caption?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div>
-      <div className="mb-1 flex items-baseline gap-3">
-        <span className="label label-accent">{label}</span>
-      </div>
-      <h3 className="font-display text-[17px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
-        {title}
-      </h3>
-      {caption && (
-        <p className="mt-1 text-[12px] leading-relaxed text-[var(--color-ink-subtle)]">
-          {caption}
-        </p>
-      )}
-      <div className="mt-4">{children}</div>
-    </div>
-  )
-}
-
-// ============================================================
-// EDITORIAL TOOLTIP — restrained, no rounded corners, mono numbers
-// ============================================================
-function EditorialTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2 shadow-xl">
-      <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-        {label}
-      </div>
-      <div className="mt-0.5 font-mono text-[13px] tabular-nums text-[var(--color-ink)]">
-        {payload[0].value.toFixed(2)}%
-      </div>
-    </div>
+    </PanelShell>
   )
 }

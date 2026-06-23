@@ -34,7 +34,7 @@ export function BrandPulse() {
     >
       {/* HEADLINE METRIC */}
       {headline && (
-        <div className="rule mb-8 grid grid-cols-1 gap-6 py-6 lg:grid-cols-[1fr,1fr]">
+        <div className="rule grid grid-cols-1 gap-6 py-5 lg:grid-cols-[1fr,1fr]">
           <div>
             <div className="label mb-1">Leading brand</div>
             <h3 className="font-display text-[26px] font-medium tracking-tight text-[var(--color-ink)]">
@@ -59,11 +59,11 @@ export function BrandPulse() {
       )}
 
       {/* PER-BRAND RADAR GRID */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
         {data.brands.map((b) => {
           const color = BRAND_COLOR[b.brand] || 'var(--color-accent)'
           return (
-            <article key={b.brandId} className="border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+            <article key={b.brandId} className="bg-[var(--color-bg)] p-4 transition-colors hover:bg-[var(--color-surface)]">
               <div className="mb-3 flex items-baseline justify-between">
                 <div>
                   <div className="font-display text-[18px] font-medium tracking-tight text-[var(--color-ink)]">

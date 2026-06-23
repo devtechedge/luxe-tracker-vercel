@@ -33,10 +33,10 @@ export function RunwayPanel() {
     >
       <section className="mb-8">
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Shows by city</div>
         </div>
-        <div className="h-56">
+        <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={cityChart} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
@@ -51,7 +51,7 @@ export function RunwayPanel() {
 
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Recent shows</div>
         </div>
         <div className="space-y-px">

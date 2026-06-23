@@ -57,7 +57,7 @@ export function ArbitragePanel() {
             </div>
 
             {/* Right: savings — explicit fixed column */}
-            <div className="min-w-0 border-t border-[var(--color-border)] pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
+            <div className="min-w-0 border-t border-[var(--color-border)] pt-6 lg:border-l lg:border-t-0 lg:border-[var(--color-border)] lg:pl-8 lg:pt-0">
               <div className="label mb-3">Net Savings</div>
               <div className="font-display text-[64px] font-medium leading-none tracking-tight text-[var(--color-accent)]">
                 {fmtEUR(headline.savingsEUR, 0)}
@@ -76,7 +76,7 @@ export function ArbitragePanel() {
       {/* === FILTER + LIST === */}
       <section>
         <div className="rule" />
-        <div className="flex items-center justify-between py-4">
+        <div className="mb-4 flex items-center justify-between border-b border-[var(--color-border)]">
           <div className="flex items-center gap-1">
             <span className="mr-2 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
               Filter

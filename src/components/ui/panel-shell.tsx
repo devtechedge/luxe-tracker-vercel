@@ -1,8 +1,8 @@
 // ============================================================
-// PANEL SHELL — reusable editorial wrapper for all 17 panels
+// PANEL SHELL — reusable editorial wrapper for all 19 panels
 // ============================================================
-// Apply the same typographic hero, header, and table styles
-// across every panel without repeating the markup.
+// Enforces visual uniformity: consistent header, spacing,
+// divider placement, and responsive padding across every panel.
 // ============================================================
 
 import type { ReactNode } from 'react'
@@ -26,7 +26,7 @@ export function PanelShell({
     <div className="fade-in">
       <header className="mb-8">
         <div className="label label-accent mb-2">{category}</div>
-        <h2 className="font-display text-[28px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
+        <h2 className="font-display text-[28px] font-medium leading-tight tracking-tight text-[var(--color-ink)] md:text-[32px]">
           {title}
         </h2>
         {subtitle && (
@@ -47,6 +47,7 @@ export function PanelShell({
 
 // ============================================================
 // SECTION — sub-section divider with optional label
+// Standardised: rule + py-5 padding for all sections
 // ============================================================
 interface SectionProps {
   label?: string
@@ -62,7 +63,7 @@ export function Section({ label, title, caption, children, className = '' }: Sec
       {(label || title || caption) && (
         <>
           <div className="rule" />
-          <div className="py-4">
+          <div className="py-5">
             {label && <div className="label mb-1">{label}</div>}
             {title && (
               <h3 className="font-display text-[18px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
@@ -137,7 +138,7 @@ export function DataTable({
 }
 
 // ============================================================
-// DATA LIST — dense vertical list (for dropdowns, queues, etc.)
+// DATA ROW — dense vertical list item
 // ============================================================
 interface DataRowProps {
   primary: ReactNode
@@ -166,14 +167,16 @@ export function DataRow({ primary, secondary, trailing, className = '' }: DataRo
 
 // ============================================================
 // KPI STRIP — inline numerical strip used in panels
+// Uniform: grid-cols-2 on mobile, grid-cols-4 on md+
 // ============================================================
 interface KpiStripProps {
   items: { label: string; value: string; accent?: boolean }[]
+  cols?: 2 | 3 | 4 | 5
 }
 
-export function KpiStrip({ items }: KpiStripProps) {
+export function KpiStrip({ items, cols = 4 }: KpiStripProps) {
   return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-[var(--color-border)] py-5 md:grid-cols-4">
+    <div className={`rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-${cols}`}>
       {items.map((item) => (
         <div key={item.label}>
           <div className="label mb-1">{item.label}</div>
@@ -244,6 +247,55 @@ export function EmptyState({ title, hint }: { title: string; hint?: string }) {
           {hint}
         </p>
       )}
+    </div>
+  )
+}
+
+// ============================================================
+// CHART PANEL — consistent wrapper for chart sections
+// ============================================================
+interface ChartPanelProps {
+  label: string
+  title: string
+  caption?: string
+  children: ReactNode
+  height?: number
+}
+
+export function ChartPanel({ label, title, caption, children, height = 260 }: ChartPanelProps) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline gap-3">
+        <span className="label label-accent">{label}</span>
+      </div>
+      <h3 className="font-display text-[17px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
+        {title}
+      </h3>
+      {caption && (
+        <p className="mt-1 text-[12px] leading-relaxed text-[var(--color-ink-subtle)]">
+          {caption}
+        </p>
+      )}
+      <div className="mt-4" style={{ height: `${height}px` }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// EDITORIAL TOOLTIP — restrained, no rounded corners, mono numbers
+// ============================================================
+export function EditorialTooltip({ active, payload, label, suffix = '%' }: any) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2 shadow-xl">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+        {label}
+      </div>
+      <div className="mt-0.5 font-mono text-[13px] tabular-nums text-[var(--color-ink)]">
+        {payload[0].value.toFixed(2)}{suffix}
+      </div>
     </div>
   )
 }

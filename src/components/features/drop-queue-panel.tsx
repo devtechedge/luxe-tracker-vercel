@@ -36,7 +36,7 @@ export function DropQueuePanel() {
       caption="Raffles, waitlists, and invite-only drops. Your simulated position vs total slots indicates odds of securing the item."
     >
       {/* KPI strip */}
-      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
         <div>
           <div className="label mb-1">Active queues</div>
           <div className="hero-num text-[36px] text-[var(--color-ink)]">{drops.length}</div>
@@ -63,7 +63,7 @@ export function DropQueuePanel() {
 
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Drop queue</div>
         </div>
         <div className="space-y-px">

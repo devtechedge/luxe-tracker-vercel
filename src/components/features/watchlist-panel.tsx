@@ -27,7 +27,7 @@ export function WatchlistPanel() {
       ) : (
         <section>
           <div className="rule" />
-          <div className="py-4">
+          <div className="py-5">
             <div className="label">{items.length} item{items.length === 1 ? '' : 's'}</div>
           </div>
           <div className="space-y-px">

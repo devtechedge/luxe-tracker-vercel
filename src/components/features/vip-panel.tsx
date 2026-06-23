@@ -27,7 +27,7 @@ export function VipPanel() {
     >
       <section className="mb-8">
         <div className="rule" />
-        <div className="grid grid-cols-1 gap-6 py-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 py-5 md:grid-cols-2">
           <div>
             <label className="mb-2 block label">Brand</label>
             <select
@@ -128,7 +128,7 @@ export function VipPanel() {
       {/* Tier ladder */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Tier ladder</div>
         </div>
         <div className="space-y-px">
@@ -138,7 +138,7 @@ export function VipPanel() {
             return (
               <article
                 key={tier.tierName}
-                className={`grid grid-cols-[40px,1fr,140px,80px] items-center gap-3 border-b border-[var(--color-border)] py-3 transition-colors ${
+                className={`grid grid-cols-[40px,1fr,140px,80px] items-center gap-3 border-b border-[var(--color-border)] py-4 transition-colors ${
                   isQualified
                     ? 'bg-[var(--color-positive-soft)]'
                     : isNext

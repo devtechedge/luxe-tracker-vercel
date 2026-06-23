@@ -32,7 +32,7 @@ export function SustainabilityPanel() {
       caption="Composite sustainability scores per maison. Higher = better ESG performance."
     >
       {/* KPI strip */}
-      <div className="rule mb-8 grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-5">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-5">
         {metrics.map((m) => (
           <div key={m.brandId}>
             <div className="label mb-1">{m.brand}</div>
@@ -46,14 +46,14 @@ export function SustainabilityPanel() {
       {/* Per-brand grid */}
       <section>
         <div className="rule" />
-        <div className="py-4">
+        <div className="py-5">
           <div className="label">Per-dimension detail</div>
         </div>
         <div className="grid grid-cols-1 gap-px border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-2 xl:grid-cols-3">
           {metrics.map((m) => {
             const color = BRAND_COLORS[m.brand] || 'var(--color-accent)'
             return (
-              <article key={m.brandId} className="bg-[var(--color-bg)] p-5">
+              <article key={m.brandId} className="bg-[var(--color-bg)] p-4 transition-colors hover:bg-[var(--color-surface)]">
                 <div className="mb-3 flex items-baseline justify-between">
                   <h4 className="font-display text-[18px] font-medium tracking-tight text-[var(--color-ink)]">
                     {m.brand}
