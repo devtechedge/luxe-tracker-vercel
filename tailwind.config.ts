@@ -1,24 +1,14 @@
 import type { Config } from 'tailwindcss'
 
+// ============================================================
+// TAILWIND v4 — config is now CSS-first via globals.css.
+// This file is kept minimal for backward compatibility.
+// All theme tokens (@theme), sources (@source), and variants
+// live in src/app/globals.css.
+// ============================================================
+
 const config: Config = {
-  darkMode: 'class',
   content: ['./src/**/*.{ts,tsx,js,jsx,mdx}'],
-  theme: {
-    extend: {
-      colors: {
-        background: '#0a0e17',
-        foreground: '#e2e8f0',
-        card: '#0d1220',
-        primary: '#f97316',
-        'primary-foreground': '#ffffff',
-        destructive: '#ef4444',
-        border: 'rgba(255,255,255,0.05)',
-        input: 'rgba(255,255,255,0.05)',
-        ring: '#f97316',
-      },
-    },
-  },
-  plugins: [require('tailwindcss-animate')],
 }
 
 export default config
