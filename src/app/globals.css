@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #0a0e17;
+    --foreground: #e2e8f0;
+    --card: #0d1220;
+    --border: rgba(255, 255, 255, 0.05);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Subtle glow backgrounds */
+.bg-glow-emerald {
+  background: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.08), transparent 60%);
+}
+.bg-glow-amber {
+  background: radial-gradient(ellipse at top, rgba(245, 158, 11, 0.08), transparent 60%);
+}
+.bg-glow-red {
+  background: radial-gradient(ellipse at top, rgba(239, 68, 68, 0.08), transparent 60%);
+}
