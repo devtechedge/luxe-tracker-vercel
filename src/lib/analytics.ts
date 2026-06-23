@@ -523,6 +523,9 @@ export function getOptimizer(productId: string, targetRegion: string): Optimizer
 export function getPriceHistory(): HistoryResponse {
   const snap = getSnapshot()
   // Aggregate by (productId, region) → compute 90d change + anomaly count
+  // Key format: `${productId}_${region}` where productId is e.g. 'prod_0' (contains an underscore!)
+  // We use lastIndexOf to find the separator between productId and region,
+  // because splitting on '_' would chop 'prod_0' into 'prod' and '0'.
   const byProductRegion: Record<string, any[]> = {}
   let totalAnomalies = 0
   for (const ph of snap.products.flatMap((p) => p.priceHistory)) {
@@ -531,9 +534,12 @@ export function getPriceHistory(): HistoryResponse {
     if (ph.anomalyFlag) totalAnomalies++
   }
   const movers = Object.entries(byProductRegion).map(([key, series]) => {
-    const [productId, region] = key.split('_')
+    const lastSep = key.lastIndexOf('_')
+    const productId = key.slice(0, lastSep)
+    const region = key.slice(lastSep + 1)
     series.sort((a, b) => a.date.localeCompare(b.date))
-    const product = snap.products.find((p) => p.id === productId)!
+    const product = snap.products.find((p) => p.id === productId)
+    if (!product) return null
     return {
       productId,
       productName: product.name,
@@ -545,7 +551,7 @@ export function getPriceHistory(): HistoryResponse {
       change90dPct: round2(((series[series.length - 1].price - series[0].price) / series[0].price) * 100),
       anomalyCount: series.filter((s) => s.anomalyFlag).length,
     }
-  })
+  }).filter((m): m is NonNullable<typeof m> => m !== null)
   movers.sort((a, b) => Math.abs(b.change90dPct) - Math.abs(a.change90dPct))
   return {
     topMovers: movers.slice(0, 30),

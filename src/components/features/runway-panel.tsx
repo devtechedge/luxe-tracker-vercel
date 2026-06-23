@@ -10,10 +10,10 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getRunway } from '@/lib/analytics'
 import { Calendar, MapPin, Sparkles } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const BRAND_COLORS: Record<string, string> = {
   Prada: '#a855f7',
@@ -43,7 +43,7 @@ export function RunwayPanel() {
             <Sparkles className="size-4 text-purple-400" />
             Runway Collection Tracker
           </CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
             {data.totalShows} shows across {data.cities.length} cities
           </p>
         </div>
@@ -74,20 +74,20 @@ export function RunwayPanel() {
             return (
               <div
                 key={show.id}
-                className="rounded-md border border-white/5 bg-white/[0.02] p-3"
+                className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
                 style={{ borderLeftColor: color, borderLeftWidth: 3 }}
               >
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-white">{show.showName}</div>
-                    <div className="mt-0.5 text-[11px] text-gray-500">
+                    <div className="text-sm font-semibold text-[var(--color-ink)]">{show.showName}</div>
+                    <div className="mt-0.5 text-[11px] text-[var(--color-ink-muted)]">
                       {show.season} {show.year} · {show.lookCount} looks · {show.standouts} standouts
                     </div>
                   </div>
                   <Badge variant="secondary">{show.brand.name}</Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
-                  <div className="flex items-center gap-1 text-gray-400">
+                  <div className="flex items-center gap-1 text-[var(--color-ink-muted)]">
                     <Calendar className="size-3" />
                     {new Date(show.showDate).toLocaleDateString('en-US', {
                       month: 'short',
@@ -95,7 +95,7 @@ export function RunwayPanel() {
                       year: 'numeric',
                     })}
                   </div>
-                  <div className="flex items-center gap-1 text-gray-400">
+                  <div className="flex items-center gap-1 text-[var(--color-ink-muted)]">
                     <MapPin className="size-3" />
                     {show.city}
                   </div>

@@ -1,12 +1,12 @@
 'use client'
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useWatchlist, useAlerts } from '@/hooks/use-watchlist'
 import { getSnapshot } from '@/lib/data-snapshot'
 import { fmtEUR, fmtPct } from '@/lib/utils'
 import { Heart, Trash2, Bell, AlertCircle } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 export function WatchlistPanel() {
   const snap = getSnapshot()
@@ -22,7 +22,7 @@ export function WatchlistPanel() {
               <Heart className="size-4 text-pink-400" />
               My Watchlist
             </CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
               {wHydrated ? items.length : '—'} items · stored locally in your browser
             </p>
           </div>
@@ -30,10 +30,10 @@ export function WatchlistPanel() {
       </CardHeader>
       <CardContent className="p-0">
         {items.length === 0 ? (
-          <div className="flex h-32 flex-col items-center justify-center px-5 text-center text-sm text-gray-500">
-            <Heart className="mb-2 size-6 text-gray-600" />
+          <div className="flex h-32 flex-col items-center justify-center px-5 text-center text-sm text-[var(--color-ink-muted)]">
+            <Heart className="mb-2 size-6 text-[var(--color-ink-subtle)]" />
             <p>Your watchlist is empty.</p>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-[var(--color-ink-subtle)]">
               Add products or brands from any panel to start tracking them.
             </p>
           </div>
@@ -59,13 +59,13 @@ export function WatchlistPanel() {
               return (
                 <div
                   key={item.id}
-                  className="flex items-start justify-between gap-3 px-5 py-3 hover:bg-white/[0.02]"
+                  className="flex items-start justify-between gap-3 px-5 py-3 hover:bg-[var(--color-surface)]"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-white">
+                    <div className="text-sm font-medium text-[var(--color-ink)]">
                       {item.productName || item.brand || item.region}
                     </div>
-                    <div className="text-[11px] text-gray-500">
+                    <div className="text-[11px] text-[var(--color-ink-muted)]">
                       <Badge variant="secondary" className="mr-1 text-[10px]">
                         {item.watchType}
                       </Badge>
@@ -74,13 +74,13 @@ export function WatchlistPanel() {
                     </div>
                     {currentPriceEUR !== null && (
                       <div className="mt-1.5 flex items-center gap-3 text-[11px]">
-                        <span className="text-gray-500">EU baseline:</span>
-                        <span className="font-mono text-white">
+                        <span className="text-[var(--color-ink-muted)]">EU baseline:</span>
+                        <span className="font-mono text-[var(--color-ink)]">
                           {fmtEUR(currentPriceEUR, 0)}
                         </span>
                         {disparity !== null && (
                           <span
-                            className={`font-mono ${disparity > 0 ? 'text-red-400' : 'text-emerald-400'}`}
+                            className={`font-mono ${disparity > 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'}`}
                           >
                             US: {fmtPct(disparity)}
                           </span>
@@ -88,7 +88,7 @@ export function WatchlistPanel() {
                       </div>
                     )}
                     {item.targetPrice && (
-                      <div className="mt-0.5 text-[11px] text-amber-400">
+                      <div className="mt-0.5 text-[11px] text-[var(--color-accent)]">
                         Target: {fmtEUR(item.targetPrice, 0)}
                       </div>
                     )}
@@ -97,7 +97,7 @@ export function WatchlistPanel() {
                     size="sm"
                     variant="ghost"
                     onClick={() => remove(item.id)}
-                    className="text-gray-500 hover:text-red-400"
+                    className="text-[var(--color-ink-muted)] hover:text-[var(--color-negative)]"
                   >
                     <Trash2 className="size-3.5" />
                   </Button>
@@ -120,7 +120,7 @@ export function AlertsPanel() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>
-              <Bell className="size-4 text-amber-400" />
+              <Bell className="size-4 text-[var(--color-accent)]" />
               Alerts
               {unread > 0 && (
                 <Badge variant="destructive" className="ml-2">
@@ -128,7 +128,7 @@ export function AlertsPanel() {
                 </Badge>
               )}
             </CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
               {hydrated ? alerts.length : '—'} alerts · click to mark read
             </p>
           </div>
@@ -141,10 +141,10 @@ export function AlertsPanel() {
       </CardHeader>
       <CardContent className="p-0">
         {alerts.length === 0 ? (
-          <div className="flex h-32 flex-col items-center justify-center px-5 text-center text-sm text-gray-500">
-            <Bell className="mb-2 size-6 text-gray-600" />
+          <div className="flex h-32 flex-col items-center justify-center px-5 text-center text-sm text-[var(--color-ink-muted)]">
+            <Bell className="mb-2 size-6 text-[var(--color-ink-subtle)]" />
             <p>No alerts yet.</p>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-[var(--color-ink-subtle)]">
               Alerts will appear here when watchlist conditions are met.
             </p>
           </div>
@@ -154,25 +154,25 @@ export function AlertsPanel() {
               <button
                 key={a.id}
                 onClick={() => markRead(a.id)}
-                className={`flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-white/[0.02] ${
-                  !a.read ? 'bg-orange-500/[0.03]' : ''
+                className={`flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-[var(--color-surface)] ${
+                  !a.read ? 'bg-[var(--color-accent)]/[0.03]' : ''
                 }`}
               >
                 <AlertCircle
                   className={`size-4 shrink-0 ${
                     a.severity === 'critical'
-                      ? 'text-red-400'
+                      ? 'text-[var(--color-negative)]'
                       : a.severity === 'warning'
-                        ? 'text-amber-400'
-                        : 'text-sky-400'
+                        ? 'text-[var(--color-accent)]'
+                        : 'text-[var(--color-info)]'
                   }`}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm text-white">{a.message}</div>
-                  <div className="mt-0.5 text-[11px] text-gray-500">
+                  <div className="text-sm text-[var(--color-ink)]">{a.message}</div>
+                  <div className="mt-0.5 text-[11px] text-[var(--color-ink-muted)]">
                     {new Date(a.createdAt).toLocaleString()}
                     {!a.read && (
-                      <span className="ml-2 text-orange-400">· unread</span>
+                      <span className="ml-2 text-[var(--color-accent)]">· unread</span>
                     )}
                   </div>
                 </div>

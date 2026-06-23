@@ -10,11 +10,11 @@ import {
   Radar,
   Tooltip,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { getSustainability } from '@/lib/analytics'
 import { Leaf } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const BRAND_COLORS: Record<string, string> = {
   Prada: '#a855f7',
@@ -32,10 +32,10 @@ export function SustainabilityPanel() {
       <CardHeader>
         <div>
           <CardTitle>
-            <Leaf className="size-4 text-emerald-400" />
+            <Leaf className="size-4 text-[var(--color-positive)]" />
             Sustainability Scores
           </CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
             2025 ESG report · carbon, materials, supply, circularity, labor
           </p>
         </div>
@@ -47,18 +47,18 @@ export function SustainabilityPanel() {
             return (
               <div
                 key={m.brandId}
-                className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <div>
-                    <div className="text-base font-semibold text-white">{m.brand}</div>
-                    <div className="text-[10px] text-gray-500">FY {m.reportYear}</div>
+                    <div className="text-base font-semibold text-[var(--color-ink)]">{m.brand}</div>
+                    <div className="text-[10px] text-[var(--color-ink-muted)]">FY {m.reportYear}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold" style={{ color }}>
                       {m.overallScore}
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider text-gray-500">
+                    <div className="text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
                       Overall
                     </div>
                   </div>
@@ -116,8 +116,8 @@ function Bar({ label, value }: { label: string; value: number }) {
   return (
     <div>
       <div className="mb-0.5 flex justify-between">
-        <span className="text-gray-500">{label}</span>
-        <span className="font-mono text-white">{value}</span>
+        <span className="text-[var(--color-ink-muted)]">{label}</span>
+        <span className="font-mono text-[var(--color-ink)]">{value}</span>
       </div>
       <Progress value={value} indicatorClassName="" className="h-1" />
       <div className="mt-[-3px] h-0.5">

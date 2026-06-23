@@ -10,10 +10,10 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getVolatility } from '@/lib/analytics'
 import { fmtPct } from '@/lib/utils'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const RISK_COLORS: Record<string, 'destructive' | 'warning' | 'success'> = {
   high: 'destructive',
@@ -32,7 +32,7 @@ export function FxVolatility() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>💱 Currency Volatility Hedge Calculator</CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
               90-day FX history · overall risk: {data.overallRisk}/100
             </p>
           </div>
@@ -40,11 +40,11 @@ export function FxVolatility() {
       </CardHeader>
       <CardContent>
         {/* Featured chart */}
-        <div className="mb-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
+        <div className="mb-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold text-white">{featured?.pair}</div>
-              <div className="text-[11px] text-gray-500">90-day daily series</div>
+              <div className="text-sm font-semibold text-[var(--color-ink)]">{featured?.pair}</div>
+              <div className="text-[11px] text-[var(--color-ink-muted)]">90-day daily series</div>
             </div>
             <Badge variant={RISK_COLORS[featured?.riskLevel || 'low']}>
               {featured?.riskLevel?.toUpperCase()} RISK · {featured?.riskScore}
@@ -108,13 +108,13 @@ export function FxVolatility() {
               onClick={() => setFeaturedIdx(i)}
               className={`flex items-center justify-between rounded-md border p-3 text-left transition-all ${
                 i === featuredIdx
-                  ? 'border-orange-500/40 bg-orange-500/5'
-                  : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'
+                  ? 'border-[var(--color-border-strong)] bg-[var(--color-accent)]/5'
+                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-white/[0.04]'
               }`}
             >
               <div>
-                <div className="text-sm font-semibold text-white">{p.pair}</div>
-                <div className="text-[10px] text-gray-500">
+                <div className="text-sm font-semibold text-[var(--color-ink)]">{p.pair}</div>
+                <div className="text-[10px] text-[var(--color-ink-muted)]">
                   Vol: {p.volatilityPct.toFixed(2)}% · Range: {p.rangePct.toFixed(2)}%
                 </div>
               </div>
@@ -130,8 +130,8 @@ export function FxVolatility() {
 function Stat({ label, value, accent }: { label: string; value: string; accent?: 'emerald' | 'red' }) {
   const color = accent === 'emerald' ? '#10b981' : accent === 'red' ? '#ef4444' : '#94a3b8'
   return (
-    <div className="rounded-md border border-white/5 bg-white/[0.02] p-2">
-      <div className="text-[10px] uppercase tracking-wider text-gray-500">{label}</div>
+    <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-2">
+      <div className="text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">{label}</div>
       <div className="mt-0.5 font-mono text-sm font-bold" style={{ color }}>
         {value}
       </div>

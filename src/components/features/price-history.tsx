@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ResponsiveContainer,
   LineChart,
@@ -11,21 +11,19 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { getPriceHistory } from '@/lib/analytics'
 import { getSnapshot } from '@/lib/data-snapshot'
 import { fmtPct } from '@/lib/utils'
-import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export function PriceHistory() {
   const data = useMemo(() => getPriceHistory(), [])
   const snap = getSnapshot()
+  const [featuredIdx, setFeaturedIdx] = useState(0)
 
-  // Pick the most volatile product to chart
   const featuredSeries = useMemo(() => {
     if (data.topMovers.length === 0) return null
-    const top = data.topMovers[0]
+    const top = data.topMovers[featuredIdx] ?? data.topMovers[0]
     const product = snap.products.find((p) => p.id === top.productId)
     if (!product) return null
     const series = product.priceHistory
@@ -34,125 +32,224 @@ export function PriceHistory() {
       .map((ph) => ({
         date: ph.date.slice(5),
         price: ph.price,
-        anomaly: ph.anomalyFlag,
       }))
     return { ...top, series, product }
-  }, [data, snap])
+  }, [data, snap, featuredIdx])
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>
-            <span className="text-amber-400">📈</span> Price History & Trend Charts
-          </CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
-            90-day daily price series · {data.totalSeries} tracked series ·{' '}
-            <span className="text-orange-400">{data.totalAnomalies} anomalies</span> (≥3% moves)
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {featuredSeries && (
-          <div className="mb-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <div className="text-sm font-semibold text-white">
-                  {featuredSeries.productName}
-                </div>
-                <div className="text-[11px] text-gray-500">
-                  {featuredSeries.brand} · {featuredSeries.region} · {featuredSeries.series.length} data points
-                </div>
+    <div className="fade-in">
+      {/* HEADER */}
+      <header className="mb-6">
+        <div className="label label-accent mb-1">Pricing</div>
+        <h2 className="font-display text-[28px] font-medium leading-tight tracking-tight text-[var(--color-ink)]">
+          Price History & Trend Charts
+        </h2>
+        <p className="mt-1 text-[13px] text-[var(--color-ink-muted)]">
+          90-day daily series · {data.totalSeries} tracked combinations ·{' '}
+          <span className="text-[var(--color-accent)]">{data.totalAnomalies} anomalies</span>{' '}
+          (≥3% daily moves)
+        </p>
+      </header>
+
+      {/* FEATURED CHART */}
+      {featuredSeries && (
+        <section className="mb-8">
+          <div className="rule" />
+          <div className="grid grid-cols-1 gap-8 py-5 lg:grid-cols-[1fr,300px]">
+            {/* Chart */}
+            <div>
+              <div className="mb-1 flex items-baseline gap-2">
+                <span className="label">Featured</span>
+                <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
+                  Most volatile in dataset
+                </span>
               </div>
-              <div className="text-right">
-                <div
-                  className={`flex items-center gap-1 text-lg font-bold ${
-                    featuredSeries.change90dPct >= 0 ? 'text-red-400' : 'text-emerald-400'
-                  }`}
-                >
-                  {featuredSeries.change90dPct >= 0 ? (
-                    <TrendingUp className="size-4" />
-                  ) : (
-                    <TrendingDown className="size-4" />
-                  )}
-                  {fmtPct(featuredSeries.change90dPct)}
-                </div>
-                <div className="text-[10px] text-gray-500">90-day change</div>
+              <h3 className="font-display text-[20px] font-medium tracking-tight text-[var(--color-ink)]">
+                {featuredSeries.productName}
+              </h3>
+              <p className="mt-1 text-[12px] text-[var(--color-ink-muted)]">
+                {featuredSeries.brand} · {featuredSeries.region} ·{' '}
+                {featuredSeries.series.length} data points over 90 days
+              </p>
+
+              <div className="mt-4 h-[260px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={featuredSeries.series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="var(--color-border)" strokeDasharray="0" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="var(--color-ink-subtle)"
+                      fontSize={10}
+                      interval="preserveStartEnd"
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="var(--color-ink-subtle)"
+                      fontSize={10}
+                      domain={['dataMin - 50', 'dataMax + 50']}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v) => v.toFixed(0)}
+                    />
+                    <Tooltip content={<PriceTooltip />} cursor={{ stroke: 'var(--color-ink-faint)' }} />
+                    <ReferenceLine
+                      y={featuredSeries.startPrice}
+                      stroke="var(--color-ink-faint)"
+                      strokeDasharray="2 4"
+                      label={{
+                        value: 'Start',
+                        position: 'right',
+                        fill: 'var(--color-ink-subtle)',
+                        fontSize: 9,
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="price"
+                      stroke="var(--color-accent)"
+                      strokeWidth={1.5}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
-            <div className="h-56 w-full">
-              <ResponsiveContainer>
-                <LineChart data={featuredSeries.series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="date"
-                    stroke="rgba(255,255,255,0.3)"
-                    fontSize={10}
-                    interval="preserveStartEnd"
-                  />
-                  <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} domain={['dataMin - 50', 'dataMax + 50']} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0d1220',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 6,
-                      fontSize: 11,
-                    }}
-                  />
-                  <ReferenceLine y={featuredSeries.startPrice} stroke="#10b981" strokeDasharray="3 3" />
-                  <Line
-                    type="monotone"
-                    dataKey="price"
-                    stroke="#f97316"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+
+            {/* Headline metric */}
+            <div className="flex flex-col justify-center border-l border-[var(--color-border)] pl-8 lg:border-l lg:pl-8">
+              <div className="label">90-day change</div>
+              <div
+                className={`hero-num mt-2 text-[64px] ${
+                  featuredSeries.change90dPct >= 0
+                    ? 'text-[var(--color-negative)]'
+                    : 'text-[var(--color-positive)]'
+                }`}
+              >
+                {featuredSeries.change90dPct >= 0 ? '+' : ''}
+                {featuredSeries.change90dPct.toFixed(1)}
+                <span className="text-[36px]">%</span>
+              </div>
+              <div className="mt-3 flex items-center gap-2 text-[12px] text-[var(--color-ink-muted)]">
+                {featuredSeries.change90dPct >= 0 ? (
+                  <ArrowUpRight className="size-3.5 text-[var(--color-negative)]" />
+                ) : (
+                  <ArrowDownRight className="size-3.5 text-[var(--color-positive)]" />
+                )}
+                <span>
+                  {featuredSeries.startPrice.toFixed(0)} → {featuredSeries.endPrice.toFixed(0)}{' '}
+                  {featuredSeries.currency}
+                </span>
+              </div>
+              <div className="mt-2 text-[11px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                {featuredSeries.anomalyCount} anomaly
+                {featuredSeries.anomalyCount === 1 ? '' : 'ies'} flagged
+              </div>
+
+              {/* Selector for other top movers */}
+              {data.topMovers.length > 1 && (
+                <div className="mt-6">
+                  <div className="label mb-2">Switch featured</div>
+                  <div className="space-y-px">
+                    {data.topMovers.slice(0, 5).map((m, i) => (
+                      <button
+                        key={`${m.productId}-${m.region}-${i}`}
+                        onClick={() => setFeaturedIdx(i)}
+                        className={`flex w-full items-baseline justify-between gap-2 rounded px-2 py-1 text-left text-[11px] transition-colors ${
+                          i === featuredIdx
+                            ? 'bg-[var(--color-surface-2)] text-[var(--color-ink)]'
+                            : 'text-[var(--color-ink-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]'
+                        }`}
+                      >
+                        <span className="truncate">{m.productName}</span>
+                        <span
+                          className={`font-mono tabular-nums ${
+                            m.change90dPct >= 0
+                              ? 'text-[var(--color-negative)]'
+                              : 'text-[var(--color-positive)]'
+                          }`}
+                        >
+                          {fmtPct(m.change90dPct)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Top movers table */}
-        <div className="max-h-[280px] overflow-y-auto">
-          <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-[#0d1220]">
-              <tr className="border-b border-white/5 text-[10px] uppercase tracking-wider text-gray-500">
-                <th className="px-3 py-2 text-left font-medium">Product</th>
-                <th className="px-3 py-2 text-left font-medium">Region</th>
-                <th className="px-3 py-2 text-right font-medium">Start</th>
-                <th className="px-3 py-2 text-right font-medium">Now</th>
-                <th className="px-3 py-2 text-right font-medium">90d Δ</th>
-                <th className="px-3 py-2 text-right font-medium">Anomalies</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.topMovers.slice(0, 15).map((m) => (
-                <tr key={`${m.productId}-${m.region}`} className="border-b border-white/[0.02] hover:bg-white/[0.02]">
-                  <td className="max-w-[180px] truncate px-3 py-2 font-medium text-white">
-                    {m.productName}
-                    <div className="text-[10px] text-gray-500">{m.brand}</div>
-                  </td>
-                  <td className="px-3 py-2 text-gray-400">{m.region}</td>
-                  <td className="px-3 py-2 text-right font-mono text-gray-400">{m.startPrice}</td>
-                  <td className="px-3 py-2 text-right font-mono text-white">{m.endPrice}</td>
-                  <td className="px-3 py-2 text-right font-mono">
-                    <Badge
-                      variant={m.change90dPct > 0 ? 'destructive' : 'success'}
-                    >
-                      {fmtPct(m.change90dPct)}
-                    </Badge>
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-orange-300">
-                    {m.anomalyCount}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* TOP MOVERS TABLE */}
+      <section>
+        <div className="rule" />
+        <div className="py-4">
+          <div className="label mb-2">Top Movers</div>
         </div>
-      </CardContent>
-    </Card>
+        <table className="w-full text-[12px] tabular-nums">
+          <thead>
+            <tr className="border-b border-[var(--color-border)]">
+              <th className="py-2 text-left"><span className="label">Product</span></th>
+              <th className="px-3 text-left"><span className="label">Region</span></th>
+              <th className="px-3 text-right"><span className="label">Start</span></th>
+              <th className="px-3 text-right"><span className="label">Now</span></th>
+              <th className="px-3 text-right"><span className="label">90d</span></th>
+              <th className="px-3 text-right"><span className="label">Anomalies</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.topMovers.slice(0, 15).map((m, i) => (
+              <tr
+                key={`${m.productId}-${m.region}`}
+                className={`border-b border-[var(--color-border)] data-row ${
+                  i % 2 === 1 ? 'bg-[var(--color-surface)]' : ''
+                }`}
+              >
+                <td className="py-2.5">
+                  <div className="text-[var(--color-ink)]">{m.productName}</div>
+                  <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
+                    {m.brand}
+                  </div>
+                </td>
+                <td className="px-3 text-[var(--color-ink-muted)]">{m.region}</td>
+                <td className="px-3 text-right font-mono text-[var(--color-ink-muted)]">
+                  {m.startPrice.toFixed(0)}
+                </td>
+                <td className="px-3 text-right font-mono text-[var(--color-ink)]">
+                  {m.endPrice.toFixed(0)}
+                </td>
+                <td
+                  className={`px-3 text-right font-mono ${
+                    m.change90dPct > 0 ? 'text-[var(--color-negative)]' : 'text-[var(--color-positive)]'
+                  }`}
+                >
+                  {fmtPct(m.change90dPct)}
+                </td>
+                <td className="px-3 text-right font-mono text-[var(--color-accent)]">
+                  {m.anomalyCount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="rule mt-1" />
+      </section>
+    </div>
+  )
+}
+
+function PriceTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2 shadow-xl">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+        {label}
+      </div>
+      <div className="mt-0.5 font-mono text-[13px] tabular-nums text-[var(--color-ink)]">
+        {payload[0].value.toFixed(2)}
+      </div>
+    </div>
   )
 }

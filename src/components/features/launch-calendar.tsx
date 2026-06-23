@@ -1,144 +1,177 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell, DataRow } from '@/components/ui/panel-shell'
 import { getLaunchesCalendar, getLaunches } from '@/lib/analytics'
 import { fmtNum } from '@/lib/utils'
 
-const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'destructive' | 'secondary'> = {
-  upcoming: 'default',
-  confirmed: 'success',
-  rumored: 'warning',
-  'sold-out': 'destructive',
+const STATUS_LABEL: Record<string, string> = {
+  upcoming: 'Upcoming',
+  confirmed: 'Confirmed',
+  rumored: 'Rumored',
+  'sold-out': 'Sold out',
+}
+
+const STATUS_DOT: Record<string, string> = {
+  upcoming: 'var(--color-warning)',
+  confirmed: 'var(--color-positive)',
+  rumored: 'var(--color-ink-subtle)',
+  'sold-out': 'var(--color-negative)',
 }
 
 export function LaunchCalendar() {
-  const [view, setView] = useState<'list' | 'calendar'>('list')
+  const [view, setView] = useState<'list' | 'grid'>('list')
   const calendar = useMemo(() => getLaunchesCalendar(), [])
   const sortedMonths = Object.keys(calendar).sort()
   const upcoming = useMemo(
     () =>
       getLaunches()
         .filter((l) => new Date(l.launchDate).getTime() > Date.now())
-        .slice(0, 20),
+        .slice(0, 30),
     [],
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>📅 Launch Calendar</CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
-              {fmtNum(upcoming.length)} upcoming launches across all regions
-            </p>
+    <PanelShell
+      category="Intelligence"
+      title="Launch Calendar"
+      subtitle={`${fmtNum(upcoming.length)} upcoming launches across 5 brands and 5 regions`}
+      caption="Editorial log of every scheduled drop. Each entry is sorted chronologically and color-coded by confirmed status."
+    >
+      {/* View toggle */}
+      <div className="mb-4 flex items-center gap-1 border-b border-[var(--color-border)]">
+        <button
+          onClick={() => setView('list')}
+          className={`-mb-px border-b px-3 py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+            view === 'list'
+              ? 'border-[var(--color-accent)] text-[var(--color-ink)]'
+              : 'border-transparent text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]'
+          }`}
+        >
+          List
+        </button>
+        <button
+          onClick={() => setView('grid')}
+          className={`-mb-px border-b px-3 py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+            view === 'grid'
+              ? 'border-[var(--color-accent)] text-[var(--color-ink)]'
+              : 'border-transparent text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]'
+          }`}
+        >
+          Grid
+        </button>
+      </div>
+
+      {view === 'list' ? (
+        <div className="rule pt-3">
+          <div className="grid grid-cols-[80px,1fr,120px,80px] gap-4 py-2 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+            <div>Date</div>
+            <div>Product</div>
+            <div className="text-right">Units</div>
+            <div className="text-right">T-</div>
           </div>
-          <div className="flex gap-1 rounded-md border border-white/10 bg-white/[0.02] p-1">
-            <button
-              onClick={() => setView('list')}
-              className={`rounded px-2 py-0.5 text-xs ${view === 'list' ? 'bg-orange-500/15 text-orange-300' : 'text-gray-400 hover:text-white'}`}
-            >
-              List
-            </button>
-            <button
-              onClick={() => setView('calendar')}
-              className={`rounded px-2 py-0.5 text-xs ${view === 'calendar' ? 'bg-orange-500/15 text-orange-300' : 'text-gray-400 hover:text-white'}`}
-            >
-              Calendar
-            </button>
-          </div>
+          {upcoming.map((l) => {
+            const date = new Date(l.launchDate)
+            const daysOut = Math.ceil((date.getTime() - Date.now()) / 86400000)
+            return (
+              <div
+                key={l.id}
+                className="grid grid-cols-[80px,1fr,120px,80px] gap-4 border-b border-[var(--color-border)] py-3 data-row"
+              >
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                    {date.toLocaleDateString('en-US', { month: 'short' })}
+                  </div>
+                  <div className="font-display text-[18px] tabular-nums leading-none text-[var(--color-ink)]">
+                    {date.getDate()}
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13px] text-[var(--color-ink)]">{l.product.name}</div>
+                  <div className="mt-1 flex items-center gap-3 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        className="status-dot"
+                        style={{ background: STATUS_DOT[l.status] }}
+                      />
+                      {STATUS_LABEL[l.status]}
+                    </span>
+                    <span>{l.brand.name}</span>
+                    <span>{l.region}</span>
+                    <span>{l.launchType}</span>
+                  </div>
+                </div>
+                <div className="text-right font-mono text-[12px] tabular-nums text-[var(--color-ink-muted)]">
+                  {fmtNum(l.expectedUnits)}
+                </div>
+                <div className="text-right font-mono text-[12px] tabular-nums text-[var(--color-ink)]">
+                  {daysOut > 0 ? `T-${daysOut}d` : '—'}
+                </div>
+              </div>
+            )
+          })}
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="max-h-[560px] overflow-y-auto">
-          {view === 'list' ? (
-            <div className="divide-y divide-white/[0.02]">
-              {upcoming.map((l) => {
-                const date = new Date(l.launchDate)
-                const daysOut = Math.ceil((date.getTime() - Date.now()) / 86400000)
-                return (
-                  <div
-                    key={l.id}
-                    className="flex items-center gap-3 px-5 py-2.5 transition-colors hover:bg-white/[0.02]"
-                  >
-                    <div className="flex w-16 flex-col items-center">
-                      <div className="text-[10px] uppercase text-gray-500">
-                        {date.toLocaleDateString('en-US', { month: 'short' })}
-                      </div>
-                      <div className="font-mono text-lg font-bold text-white">{date.getDate()}</div>
+      ) : (
+        <div className="rule pt-3 space-y-6">
+          {sortedMonths.slice(0, 3).map((month) => {
+            const launches = calendar[month]
+            return (
+              <div key={month}>
+                <div className="mb-3 flex items-baseline justify-between">
+                  <h4 className="font-display text-[16px] font-medium tracking-tight text-[var(--color-ink)]">
+                    {new Date(month + '-01').toLocaleDateString('en-US', {
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </h4>
+                  <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-subtle)]">
+                    {launches.length} launches
+                  </span>
+                </div>
+                <div className="grid grid-cols-7 gap-px border-l border-t border-[var(--color-border)]">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                    <div
+                      key={d}
+                      className="border-b border-r border-[var(--color-border)] bg-[var(--color-surface)] py-1 text-center text-[9px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]"
+                    >
+                      {d}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-white truncate">
+                  ))}
+                  {Array.from({
+                    length: (new Date(month + '-01').getDay() + 6) % 7,
+                  }).map((_, i) => (
+                    <div
+                      key={`pad-${i}`}
+                      className="min-h-[60px] border-b border-r border-[var(--color-border)]"
+                    />
+                  ))}
+                  {launches.map((l) => {
+                    const day = new Date(l.launchDate).getDate()
+                    return (
+                      <div
+                        key={l.id}
+                        className="min-h-[60px] border-b border-r border-[var(--color-border)] p-1.5"
+                        title={`${l.product.name} · ${l.brand.name}`}
+                      >
+                        <div className="font-mono text-[10px] tabular-nums text-[var(--color-ink-subtle)]">
+                          {day}
+                        </div>
+                        <div className="mt-1 truncate text-[10px] text-[var(--color-ink)]">
                           {l.product.name}
-                        </span>
-                        <Badge variant="secondary">{l.region}</Badge>
+                        </div>
+                        <div
+                          className="mt-1 h-px"
+                          style={{ background: STATUS_DOT[l.status] }}
+                        />
                       </div>
-                      <div className="mt-0.5 text-[11px] text-gray-500">
-                        {l.brand.name} · {l.launchType} · {fmtNum(l.expectedUnits)} units
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={STATUS_COLORS[l.status]}>{l.status}</Badge>
-                      <div className="mt-1 font-mono text-[11px] text-gray-400">
-                        {daysOut > 0 ? `T-${daysOut}d` : 'past'}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="space-y-4 p-5">
-              {sortedMonths.map((month) => {
-                const launches = calendar[month]
-                return (
-                  <div key={month}>
-                    <div className="mb-2 flex items-center justify-between">
-                      <h4 className="text-sm font-semibold text-white">
-                        {new Date(month + '-01').toLocaleDateString('en-US', {
-                          month: 'long',
-                          year: 'numeric',
-                        })}
-                      </h4>
-                      <span className="text-[11px] text-gray-500">
-                        {launches.length} launches
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {Array.from({ length: new Date(month + '-01').getDay() }).map((_, i) => (
-                        <div key={`pad-${i}`} />
-                      ))}
-                      {launches.map((l) => {
-                        const day = new Date(l.launchDate).getDate()
-                        const dateKey = `${month}-${String(day).padStart(2, '0')}`
-                        const sameDay = launches.filter(
-                          (x) => x.launchDate.slice(0, 10) === dateKey,
-                        ).length
-                        return (
-                          <div
-                            key={l.id}
-                            className="flex flex-col items-center rounded-md border border-white/5 bg-white/[0.02] p-1.5"
-                            title={l.product.name}
-                          >
-                            <div className="text-[10px] text-gray-500">{day}</div>
-                            <div className="mt-0.5 size-1.5 rounded-full bg-orange-500" />
-                            {sameDay > 1 && (
-                              <div className="text-[8px] text-orange-300">×{sameDay}</div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </PanelShell>
   )
 }

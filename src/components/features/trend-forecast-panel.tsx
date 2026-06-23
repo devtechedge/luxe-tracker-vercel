@@ -1,10 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getTrends } from '@/lib/analytics'
 import { TrendingUp, Sparkles } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const TYPE_ICONS: Record<string, string> = {
   color: '🎨',
@@ -33,14 +33,14 @@ export function TrendForecastPanel() {
               <Sparkles className="size-4 text-pink-400" />
               Seasonal Trend Forecast
             </CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
               {allTrends.length} predicted trends · intensity + confidence scoring
             </p>
           </div>
           <select
             value={season}
             onChange={(e) => setSeason(e.target.value)}
-            className="h-9 rounded-md border border-white/10 bg-white/[0.03] px-2 text-xs text-white"
+            className="h-9 rounded-md border border-[var(--color-border)] bg-white/[0.03] px-2 text-xs text-[var(--color-ink)]"
           >
             <option value="all">All seasons</option>
             {seasons.map((s) => (
@@ -59,15 +59,15 @@ export function TrendForecastPanel() {
             return (
               <div
                 key={t.id}
-                className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
                 style={{ borderLeftColor: intensityColor, borderLeftWidth: 3 }}
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-base font-semibold text-white">
+                    <div className="text-base font-semibold text-[var(--color-ink)]">
                       {TYPE_ICONS[t.trendType] || '✨'} {t.trendName}
                     </div>
-                    <div className="text-[11px] text-gray-500">
+                    <div className="text-[11px] text-[var(--color-ink-muted)]">
                       {t.season} {t.year} · {t.category}
                     </div>
                   </div>
@@ -78,12 +78,12 @@ export function TrendForecastPanel() {
                 <div className="mt-3 space-y-2">
                   <div>
                     <div className="mb-0.5 flex justify-between text-[11px]">
-                      <span className="text-gray-500">Intensity</span>
+                      <span className="text-[var(--color-ink-muted)]">Intensity</span>
                       <span className="font-mono font-bold" style={{ color: intensityColor }}>
                         {t.intensity}
                       </span>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-2)]">
                       <div
                         className="h-full transition-all duration-300"
                         style={{ width: `${t.intensity}%`, backgroundColor: intensityColor }}
@@ -92,10 +92,10 @@ export function TrendForecastPanel() {
                   </div>
                   <div>
                     <div className="mb-0.5 flex justify-between text-[11px]">
-                      <span className="text-gray-500">Confidence</span>
-                      <span className="font-mono text-white">{t.confidence}%</span>
+                      <span className="text-[var(--color-ink-muted)]">Confidence</span>
+                      <span className="font-mono text-[var(--color-ink)]">{t.confidence}%</span>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-2)]">
                       <div
                         className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
                         style={{ width: `${t.confidence}%` }}

@@ -6,61 +6,220 @@
 @source "../**/*.{ts,tsx,js,jsx,mdx}";
 
 @theme {
-  --color-background: #0a0e17;
-  --color-foreground: #e2e8f0;
-  --color-card: #0d1220;
-  --color-border: rgba(255, 255, 255, 0.05);
+  /* === DARK MODE (default) === */
+  --color-bg: #0B0B0D;
+  --color-surface: #131316;
+  --color-surface-2: #18181C;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
 
-  --color-primary: #f97316;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #1e293b;
-  --color-secondary-foreground: #e2e8f0;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
-  --color-muted: #64748b;
-  --color-muted-foreground: #94a3b8;
-  --color-accent: #f59e0b;
-  --color-accent-foreground: #0a0e17;
-  --color-input: rgba(255, 255, 255, 0.05);
-  --color-ring: #f97316;
+  --color-ink: #ECECEC;
+  --color-ink-muted: rgba(236, 236, 236, 0.55);
+  --color-ink-subtle: rgba(236, 236, 236, 0.35);
+  --color-ink-faint: rgba(236, 236, 236, 0.18);
+
+  --color-accent: #F97316;
+  --color-accent-soft: rgba(249, 115, 22, 0.12);
+  --color-accent-fg: #0B0B0D;
+
+  --color-positive: #10B981;
+  --color-positive-soft: rgba(16, 185, 129, 0.12);
+  --color-negative: #EF4444;
+  --color-negative-soft: rgba(239, 68, 68, 0.12);
+  --color-warning: #F59E0B;
+  --color-info: #6B7280;
+
+  --font-display: "New York", "Iowan Old Style", "Charter", "Georgia", ui-serif, serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", "IBM Plex Mono", ui-monospace, "Menlo", monospace;
 }
 
+/* ============================================================
+   LIGHT MODE OVERRIDES — applied via [data-theme="light"]
+   ============================================================ */
+[data-theme="light"] {
+  --color-bg: #FAFAF7;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F4F4EF;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.14);
+
+  --color-ink: #0B0B0D;
+  --color-ink-muted: rgba(11, 11, 13, 0.65);
+  --color-ink-subtle: rgba(11, 11, 13, 0.4);
+  --color-ink-faint: rgba(11, 11, 13, 0.2);
+
+  --color-accent: #EA580C;
+  --color-accent-soft: rgba(234, 88, 12, 0.10);
+  --color-accent-fg: #FFFFFF;
+
+  --color-positive: #059669;
+  --color-positive-soft: rgba(5, 150, 105, 0.10);
+  --color-negative: #DC2626;
+  --color-negative-soft: rgba(220, 38, 38, 0.10);
+  --color-warning: #D97706;
+  --color-info: #6B7280;
+}
+
+/* ============================================================
+   BASE TYPOGRAPHY
+   ============================================================ */
 @layer base {
-  :root {
-    --background: #0a0e17;
-    --foreground: #e2e8f0;
-    --card: #0d1220;
-    --border: rgba(255, 255, 255, 0.05);
+  html, body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  html, body {
-    background: var(--color-background);
-    color: var(--color-foreground);
+  body {
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* All numbers get tabular alignment — critical for data tables */
+  .num,
+  table td,
+  table th,
+  [class*="font-mono"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "lnum";
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
   }
 }
 
+/* ============================================================
+   SCROLLBARS — themed, minimal
+   ============================================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  background: var(--color-border-strong);
+  border-radius: 10px;
+  border: 2px solid var(--color-bg);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-ink-faint);
 }
 
-/* Subtle glow backgrounds */
-.bg-glow-emerald {
-  background: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.08), transparent 60%);
+/* ============================================================
+   TYPOGRAPHIC UTILITIES
+   ============================================================ */
+
+/* Display serif — used for hero numbers, panel titles */
+.font-display {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01";
+  letter-spacing: -0.02em;
 }
-.bg-glow-amber {
-  background: radial-gradient(ellipse at top, rgba(245, 158, 11, 0.08), transparent 60%);
+
+/* Editorial small caps for labels */
+.label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
 }
-.bg-glow-red {
-  background: radial-gradient(ellipse at top, rgba(239, 68, 68, 0.08), transparent 60%);
+
+.label-accent {
+  color: var(--color-accent);
+}
+
+/* Thin underline for editorial links */
+.editorial-link {
+  position: relative;
+  display: inline-block;
+}
+.editorial-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.3;
+  transition: opacity 150ms ease;
+}
+.editorial-link:hover::after {
+  opacity: 0.8;
+}
+
+/* Divider rules — very thin, used in editorial layouts */
+.rule {
+  height: 1px;
+  background: var(--color-border);
+}
+.rule-strong {
+  height: 1px;
+  background: var(--color-border-strong);
+}
+
+/* Fade-in on mount — used for chart sections */
+@keyframes editorial-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: editorial-fade-in 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.fade-in-delay-1 { animation-delay: 60ms; }
+.fade-in-delay-2 { animation-delay: 120ms; }
+.fade-in-delay-3 { animation-delay: 180ms; }
+.fade-in-delay-4 { animation-delay: 240ms; }
+
+/* Status dot — small circular indicator */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Tabular column rules — for dense data tables */
+.tabular-rule td {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Subtle data table hover */
+.data-row {
+  transition: background-color 120ms ease;
+}
+.data-row:hover {
+  background: var(--color-surface-2);
+}
+
+/* Number prominence */
+.hero-num {
+  font-family: var(--font-display);
+  font-feature-settings: "tnum", "lnum", "ss01";
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  line-height: 0.95;
+}
+
+/* Sparkline-style accent bar */
+.accent-bar {
+  background: var(--color-accent);
+  width: 2px;
 }

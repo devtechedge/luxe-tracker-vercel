@@ -10,9 +10,9 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getConflicts } from '@/lib/analytics'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const RISK_COLORS: Record<string, 'destructive' | 'warning' | 'success'> = {
   high: 'destructive',
@@ -28,16 +28,16 @@ export function LaunchConflicts() {
       <CardHeader>
         <div>
           <CardTitle>⚔️ Launch Conflict Radar</CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
-            <span className="text-orange-400">{data.totalConflicts} conflict days</span> detected ·{' '}
+          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
+            <span className="text-[var(--color-accent)]">{data.totalConflicts} conflict days</span> detected ·{' '}
             cannibalization across brands
           </p>
         </div>
       </CardHeader>
       <CardContent>
         {/* Weekly density chart */}
-        <div className="mb-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
-          <div className="mb-2 text-xs uppercase tracking-wider text-gray-500">
+        <div className="mb-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <div className="mb-2 text-xs uppercase tracking-wider text-[var(--color-ink-muted)]">
             Weekly launch density
           </div>
           <div className="h-48 w-full">
@@ -65,11 +65,11 @@ export function LaunchConflicts() {
           {data.conflictDays.slice(0, 8).map((day) => (
             <div
               key={day.date}
-              className="rounded-md border border-white/5 bg-white/[0.02] p-3"
+              className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm font-semibold text-white">
+                  <span className="font-mono text-sm font-semibold text-[var(--color-ink)]">
                     {day.date}
                   </span>
                   <Badge variant="secondary">{day.eventCount} launches</Badge>
@@ -87,10 +87,10 @@ export function LaunchConflicts() {
               </div>
               <div className="space-y-1 text-[11px]">
                 {day.events.slice(0, 3).map((e, i) => (
-                  <div key={i} className="flex items-center gap-2 text-gray-400">
-                    <span className="size-1 rounded-full bg-orange-500" />
+                  <div key={i} className="flex items-center gap-2 text-[var(--color-ink-muted)]">
+                    <span className="size-1 rounded-full bg-[var(--color-accent)]" />
                     <span className="truncate">{e.productName}</span>
-                    <span className="text-gray-600">·</span>
+                    <span className="text-[var(--color-ink-subtle)]">·</span>
                     <span>{e.region}</span>
                   </div>
                 ))}

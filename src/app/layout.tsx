@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -8,14 +7,39 @@ export const metadata: Metadata = {
     'High-fashion global launch and price disparity tracker. 5 brands · 25 products · 11k+ price history rows · 15 intelligence modules.',
 }
 
+// Inline script that runs BEFORE React hydrates, applies the saved theme
+// to <html data-theme="..."> so there's no flash on first paint.
+const themeScript = `
+(function() {
+  try {
+    var t = localStorage.getItem('luxe-tracker:theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+`.trim()
+
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#0a0e17] text-white antialiased">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body
+        className="min-h-screen bg-[var(--color-bg)] text-[var(--color-ink)] antialiased"
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontFeatureSettings: '"ss01", "cv11"',
+        }}
+      >
+        {children}
+      </body>
     </html>
   )
 }

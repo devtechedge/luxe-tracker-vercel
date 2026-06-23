@@ -11,10 +11,10 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getCompetitiveMatrix } from '@/lib/analytics'
 import { fmtEUR } from '@/lib/utils'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const BRAND_COLORS: Record<string, string> = {
   Prada: '#a855f7',
@@ -43,7 +43,7 @@ export function CompetitiveMatrix() {
       <CardHeader>
         <div>
           <CardTitle>🆚 Competitive Brand Comparison</CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
             Average EU price per category · value leader vs premium leader
           </p>
         </div>
@@ -86,24 +86,24 @@ export function CompetitiveMatrix() {
           {data.categories.map((cat) => (
             <div
               key={cat.category}
-              className="rounded-md border border-white/5 bg-white/[0.02] p-3"
+              className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
             >
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-white">{cat.category}</h4>
+                <h4 className="text-sm font-semibold text-[var(--color-ink)]">{cat.category}</h4>
                 <Badge variant="secondary">{cat.totalProducts} products</Badge>
               </div>
               <div className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Value leader:</span>
-                  <span className="font-medium text-emerald-400">{cat.valueLeader}</span>
+                  <span className="text-[var(--color-ink-muted)]">Value leader:</span>
+                  <span className="font-medium text-[var(--color-positive)]">{cat.valueLeader}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Premium leader:</span>
-                  <span className="font-medium text-orange-400">{cat.premiumLeader}</span>
+                  <span className="text-[var(--color-ink-muted)]">Premium leader:</span>
+                  <span className="font-medium text-[var(--color-accent)]">{cat.premiumLeader}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Spread:</span>
-                  <span className="font-mono text-white">
+                  <span className="text-[var(--color-ink-muted)]">Spread:</span>
+                  <span className="font-mono text-[var(--color-ink)]">
                     {fmtEUR(cat.priceSpreadEUR, 0)} ({cat.priceSpreadPct.toFixed(1)}%)
                   </span>
                 </div>

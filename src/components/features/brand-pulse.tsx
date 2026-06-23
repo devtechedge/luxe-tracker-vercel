@@ -10,11 +10,10 @@ import {
   Radar,
   Tooltip,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { PanelShell, ChartTooltip } from '@/components/ui/panel-shell'
 import { getBrandPulse } from '@/lib/analytics'
 
-const BRAND_COLORS: Record<string, string> = {
+const BRAND_COLOR: Record<string, string> = {
   Prada: '#a855f7',
   Gucci: '#10b981',
   Balenciaga: '#ef4444',
@@ -24,101 +23,120 @@ const BRAND_COLORS: Record<string, string> = {
 
 export function BrandPulse() {
   const data = useMemo(() => getBrandPulse(), [])
-  const [featured, ...rest] = data.brands
+  const headline = data.brands[0]
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>💓 Brand Pulse Radar</CardTitle>
-          <p className="mt-1 text-xs text-gray-500">
-            5-dimensional brand health · prestige × pricing × hype × velocity × stock
-          </p>
+    <PanelShell
+      category="Market"
+      title="Brand Pulse"
+      subtitle="Five-dimensional brand health index"
+      caption="Composite score from prestige, pricing power, hype, launch velocity, and stock availability."
+    >
+      {/* HEADLINE METRIC */}
+      {headline && (
+        <div className="rule mb-8 grid grid-cols-1 gap-6 py-6 lg:grid-cols-[1fr,1fr]">
+          <div>
+            <div className="label mb-1">Leading brand</div>
+            <h3 className="font-display text-[26px] font-medium tracking-tight text-[var(--color-ink)]">
+              {headline.brand}
+            </h3>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+              {headline.country} · {headline.productCount} products ·{' '}
+              {headline.upcomingLaunches} upcoming
+            </p>
+          </div>
+          <div>
+            <div className="label">Pulse Index</div>
+            <div className="hero-num mt-1 text-[80px]" style={{ color: BRAND_COLOR[headline.brand] }}>
+              {headline.overallScore}
+              <span className="text-[36px] text-[var(--color-ink-subtle)]">/100</span>
+            </div>
+            <div className="mt-1 text-[11px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+              Avg hype {headline.avgHypeScore}
+            </div>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {data.brands.map((b) => {
-            const color = BRAND_COLORS[b.brand] || '#f97316'
-            return (
-              <div
-                key={b.brandId}
-                className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{b.logo}</span>
-                      <div>
-                        <div className="text-base font-semibold text-white">{b.brand}</div>
-                        <div className="text-[10px] text-gray-500">{b.country}</div>
-                      </div>
-                    </div>
+      )}
+
+      {/* PER-BRAND RADAR GRID */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {data.brands.map((b) => {
+          const color = BRAND_COLOR[b.brand] || 'var(--color-accent)'
+          return (
+            <article key={b.brandId} className="border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+              <div className="mb-3 flex items-baseline justify-between">
+                <div>
+                  <div className="font-display text-[18px] font-medium tracking-tight text-[var(--color-ink)]">
+                    {b.brand}
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold" style={{ color }}>
-                      {b.overallScore}
-                    </div>
-                    <div className="text-[10px] uppercase tracking-wider text-gray-500">
-                      Pulse Index
-                    </div>
+                  <div className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    {b.country}
                   </div>
                 </div>
-                <div className="h-44 w-full">
-                  <ResponsiveContainer>
-                    <RadarChart
-                      data={[
-                        { axis: 'Prestige', value: b.dimensions.prestige },
-                        { axis: 'Pricing', value: b.dimensions.pricingPower },
-                        { axis: 'Hype', value: b.dimensions.hypeIndex },
-                        { axis: 'Velocity', value: b.dimensions.launchVelocity },
-                        { axis: 'Stock', value: b.dimensions.stockHealth },
-                      ]}
-                    >
-                      <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                      <PolarAngleAxis dataKey="axis" stroke="rgba(255,255,255,0.5)" fontSize={10} />
-                      <PolarRadiusAxis stroke="rgba(255,255,255,0.2)" fontSize={9} domain={[0, 100]} />
-                      <Radar
-                        name={b.brand}
-                        dataKey="value"
-                        stroke={color}
-                        fill={color}
-                        fillOpacity={0.3}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#0d1220',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: 6,
-                          fontSize: 11,
-                        }}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
-                  <div>
-                    <span className="text-gray-500">Products:</span>{' '}
-                    <span className="text-white">{b.productCount}</span>
+                <div className="text-right">
+                  <div className="font-mono text-[28px] tabular-nums" style={{ color }}>
+                    {b.overallScore}
                   </div>
-                  <div>
-                    <span className="text-gray-500">Upcoming:</span>{' '}
-                    <span className="text-white">{b.upcomingLaunches}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Avg hype:</span>{' '}
-                    <span className="text-orange-400">{b.avgHypeScore}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Stock health:</span>{' '}
-                    <span className="text-white">{b.dimensions.stockHealth}</span>
+                  <div className="text-[9px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+                    /100
                   </div>
                 </div>
               </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
+
+              <div className="h-44">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart
+                    data={[
+                      { axis: 'Prestige', value: b.dimensions.prestige },
+                      { axis: 'Pricing', value: b.dimensions.pricingPower },
+                      { axis: 'Hype', value: b.dimensions.hypeIndex },
+                      { axis: 'Velocity', value: b.dimensions.launchVelocity },
+                      { axis: 'Stock', value: b.dimensions.stockHealth },
+                    ]}
+                  >
+                    <PolarGrid stroke="var(--color-border)" />
+                    <PolarAngleAxis
+                      dataKey="axis"
+                      stroke="var(--color-ink-subtle)"
+                      fontSize={10}
+                      tick={{ fill: 'var(--color-ink-muted)' }}
+                    />
+                    <PolarRadiusAxis
+                      stroke="var(--color-ink-faint)"
+                      fontSize={9}
+                      domain={[0, 100]}
+                      tick={false}
+                      axisLine={false}
+                    />
+                    <Radar
+                      name={b.brand}
+                      dataKey="value"
+                      stroke={color}
+                      fill={color}
+                      fillOpacity={0.18}
+                      strokeWidth={1.5}
+                    />
+                    <Tooltip content={<ChartTooltip />} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="mt-3 grid grid-cols-5 gap-px border-t border-[var(--color-border)] pt-3">
+                {Object.entries(b.dimensions).map(([key, val]) => (
+                  <div key={key} className="text-center">
+                    <div className="font-mono text-[12px] tabular-nums text-[var(--color-ink)]">
+                      {val}
+                    </div>
+                    <div className="mt-0.5 text-[9px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)]">
+                      {key.replace('pricingPower', 'Pricing').replace('launchVelocity', 'Velocity')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </PanelShell>
   )
 }

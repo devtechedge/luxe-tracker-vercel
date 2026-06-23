@@ -10,10 +10,10 @@ import {
   Radar,
   Tooltip,
 } from 'recharts'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getHype } from '@/lib/analytics'
 import { Flame } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 export function HypePredictor() {
   const data = useMemo(() => getHype(), [])
@@ -44,18 +44,18 @@ export function HypePredictor() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>
-              <Flame className="size-4 text-red-400" />
+              <Flame className="size-4 text-[var(--color-negative)]" />
               Launch Hype Predictor
             </CardTitle>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
               Predicted demand for {data.totalProducts} products · avg hype{' '}
-              <span className="font-mono text-orange-400">{data.avgHypeScore}</span>
+              <span className="font-mono text-[var(--color-accent)]">{data.avgHypeScore}</span>
             </p>
           </div>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="h-9 rounded-md border border-white/10 bg-white/[0.03] px-2 text-xs text-white"
+            className="h-9 rounded-md border border-[var(--color-border)] bg-white/[0.03] px-2 text-xs text-[var(--color-ink)]"
           >
             <option value="all">All categories</option>
             {categories.map((c) => (
@@ -68,39 +68,39 @@ export function HypePredictor() {
       </CardHeader>
       <CardContent>
         {featured && (
-          <div className="mb-4 grid grid-cols-1 gap-4 rounded-lg border border-white/5 bg-white/[0.02] p-4 md:grid-cols-2">
+          <div className="mb-4 grid grid-cols-1 gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 md:grid-cols-2">
             <div>
-              <div className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+              <div className="mb-1 text-xs uppercase tracking-wider text-[var(--color-ink-muted)]">
                 Top Hype: {featured.brand}
               </div>
-              <div className="text-lg font-semibold text-white">{featured.productName}</div>
-              <div className="mt-1 text-[11px] text-gray-500">{featured.sku}</div>
+              <div className="text-lg font-semibold text-[var(--color-ink)]">{featured.productName}</div>
+              <div className="mt-1 text-[11px] text-[var(--color-ink-muted)]">{featured.sku}</div>
               <div className="mt-3 flex items-center gap-3">
-                <div className="text-3xl font-bold text-orange-400">{featured.hypeScore}</div>
-                <div className="text-[10px] uppercase tracking-wider text-gray-500">
+                <div className="text-3xl font-bold text-[var(--color-accent)]">{featured.hypeScore}</div>
+                <div className="text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">
                   Hype Index
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
                 <div>
-                  <span className="text-gray-500">Edition:</span>{' '}
-                  <span className="text-white">{featured.editionType}</span>
+                  <span className="text-[var(--color-ink-muted)]">Edition:</span>{' '}
+                  <span className="text-[var(--color-ink)]">{featured.editionType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Resale idx:</span>{' '}
-                  <span className="font-mono text-white">
+                  <span className="text-[var(--color-ink-muted)]">Resale idx:</span>{' '}
+                  <span className="font-mono text-[var(--color-ink)]">
                     {featured.resaleValueIdx.toFixed(2)}×
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Days to launch:</span>{' '}
-                  <span className="font-mono text-white">
+                  <span className="text-[var(--color-ink-muted)]">Days to launch:</span>{' '}
+                  <span className="font-mono text-[var(--color-ink)]">
                     {featured.daysToLaunch ?? '—'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Region:</span>{' '}
-                  <span className="text-white">{featured.launchRegion ?? '—'}</span>
+                  <span className="text-[var(--color-ink-muted)]">Region:</span>{' '}
+                  <span className="text-[var(--color-ink)]">{featured.launchRegion ?? '—'}</span>
                 </div>
               </div>
             </div>
@@ -135,22 +135,22 @@ export function HypePredictor() {
           {filtered.slice(0, 12).map((p) => (
             <div
               key={p.productId}
-              className="rounded-md border border-white/5 bg-white/[0.02] p-3"
+              className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs font-medium text-white" title={p.productName}>
+                  <div className="truncate text-xs font-medium text-[var(--color-ink)]" title={p.productName}>
                     {p.productName}
                   </div>
-                  <div className="text-[10px] text-gray-500">{p.brand}</div>
+                  <div className="text-[10px] text-[var(--color-ink-muted)]">{p.brand}</div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="font-mono text-base font-bold text-orange-400">
+                  <span className="font-mono text-base font-bold text-[var(--color-accent)]">
                     {p.hypeScore}
                   </span>
                 </div>
               </div>
-              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/5">
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-[var(--color-surface-2)]">
                 <div
                   className="h-full bg-gradient-to-r from-orange-500 to-red-500"
                   style={{ width: `${p.hypeScore}%` }}

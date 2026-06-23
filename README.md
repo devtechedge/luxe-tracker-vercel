@@ -1,269 +1,187 @@
-# 👑 LUXE TRACKER — Vercel-Only Build
+# LUXE TRACKER — Vercel-Only Build
 
-A production-grade, containerized analytics platform that tracks regional pricing disparities, drop calendars, currency exposure, arbitrage windows, and demand signals across **Prada**, **Gucci**, **Balenciaga**, **Louis Vuitton**, and **Versace** — covering EU, US, UK, Norway, and India markets.
+High-fashion global launch & price disparity tracker. 5 brands × 25 products × 90-day price history. 17 panels (Intelligence · Pricing · Market · Luxury · Personal). Single Vercel deployment, no external services.
 
-**This is the restructured, Vercel-only build** — the entire app (frontend + backend + database) runs on Vercel as a single Next.js deployment. **No Supabase. No Prisma. No PostgreSQL. No external services.**
-
-![Next.js](https://img.shields.io/badge/Next.js-15-black) ![Vercel](https://img.shields.io/badge/Vercel-ready-black) ![Tailwind](https://img.shields.io/badge/Tailwind-4-06b6d4) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
+![Next.js 15](https://img.shields.io/badge/Next.js-15-black) ![Vercel](https://img.shields.io/badge/Vercel-ready-black) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-06b6d4) ![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178c6)
 
 ---
 
-## 🎯 What changed vs the original repo
+## Architecture
 
-| Original (Next.js + Prisma + Supabase) | Vercel-only (this build) |
-|---|---|
-| `prisma/schema.prisma` — 16 relational models | `src/lib/data-snapshot.ts` — single in-memory snapshot |
-| `prisma/seed.ts` — writes 11k+ rows to Postgres | `src/lib/data-snapshot.ts` — generates equivalent data on module load |
-| `src/app/api/analytics/route.ts` — Prisma queries | `src/lib/analytics.ts` — synchronous in-memory queries |
-| `WatchlistItem` + `Alert` tables in Supabase | `useLocalStorage` hook (`src/hooks/use-watchlist.ts`) |
-| `mini-services/analytics-engine/` — Bun backend | **Removed entirely** |
-| `Dockerfile`, `docker-compose.yml`, `Caddyfile` | **Removed** |
-| `DATABASE_URL` + `DIRECT_DATABASE_URL` env vars | **None required** |
-| `bun run db:push`, `bun run db:seed` | **None** — data is generated at module load |
-
-### ✅ Preserved 1:1
-
-All **17 panels** from the live site:
-1. **Overview** — 8 KPI cards + region/brand disparity charts
-2. **Launch Calendar** — list + grid view of upcoming drops
-3. **Price Matrix** — sortable 5-region × 25-product table
-4. **Arbitrage Finder** — buy-cheap / ship-expensive opportunities
-5. **Landed Cost Optimizer** — best route per (product, target-region) pair
-6. **Price History** — 90-day daily series + anomaly flags
-7. **FX Volatility** — 4 currency pairs with risk scoring
-8. **Hype Predictor** — 5-dimension radar per product
-9. **Launch Conflicts** — cannibalization detection
-10. **Stock-Out Risk** — sell-out probability by SKU × region
-11. **Competitive Matrix** — brand-vs-brand price spread per category
-12. **Brand Pulse Radar** — 5-dimension brand health
-13. **Runway Tracker** — show catalog across 6 cities
-14. **VIP Tier Simulator** — Silver / Gold / Platinum / Diamond
-15. **Sustainability** — 5-dimension ESG scoring per brand
-16. **Trend Forecast** — seasonal trend predictions
-17. **Drop Queue** — exclusive drop raffles + waitlists
-
-Plus:
-- ✅ **My Watchlist** with live pricing + disparity lookup
-- ✅ **Alerts** panel with unread badge
-- ✅ All Recharts visualizations (Bar, Line, Area, Radar, Composed)
-- ✅ Sidebar navigation grouped by category (Intelligence / Pricing / Market / Luxury / Personal)
-- ✅ All color palette and design tokens preserved
-
----
-
-## 🚀 Deploy to Vercel (60 seconds)
-
-### Option A — Vercel Dashboard
-
-1. **Push to GitHub:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Vercel-only luxe tracker"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/luxe-tracker-vercel.git
-   git push -u origin main
-   ```
-
-2. **Import on Vercel:**
-   - Go to [vercel.com/new](https://vercel.com/new)
-   - Click **Import** next to your repo
-   - Framework preset: **Next.js** (auto-detected)
-   - Click **Deploy**
-
-3. **Done.** No env vars to add. The dashboard works immediately.
-
-### Option B — Vercel CLI
-
-```bash
-npm i -g vercel
-vercel login
-vercel              # preview
-vercel --prod       # production
+```
+Single Vercel deployment
+└── Next.js 15 app
+    ├── src/lib/data-snapshot.ts   # 5 brands × 25 products × 11,375 price rows, deterministic PRNG
+    ├── src/lib/analytics.ts       # 17 sync query functions (replaces /api/analytics)
+    ├── src/lib/theme.ts           # dark/light mode hook + localStorage persistence
+    ├── src/lib/fashion-types.ts   # 17 feature interfaces
+    ├── src/hooks/use-watchlist.ts # localStorage watchlist + alerts
+    └── src/components/ui/panel-shell.tsx # editorial reusable: PanelShell, DataTable, etc.
 ```
 
+**Removed from original:** `prisma/`, `supabase/`, `mini-services/`, `Dockerfile`, `docker-compose.yml`, `Caddyfile`, `bun.lock`. All replaced by `data-snapshot.ts`.
+
 ---
 
-## 🛠 Local development
+## Changelog (all fixes + redesign)
 
-```bash
-bun install         # or npm install
-bun run dev         # → http://localhost:3000
+### #1 · Vercel-only migration (initial build)
+- Replaced `prisma/schema.prisma` (16 models) + `prisma/seed.ts` → single in-memory snapshot at `src/lib/data-snapshot.ts`
+- Replaced `/api/analytics` route handler → synchronous `src/lib/analytics.ts` functions
+- Replaced Supabase watchlist/alerts → `useLocalStorage` hook
+- 17 panels: Overview · Price Matrix · Launch Calendar · Arbitrage · Optimizer · Price History · FX Volatility · Hype Predictor · Launch Conflicts · Stock Risk · Competitive Matrix · Brand Pulse · Runway Tracker · VIP Tier · Sustainability · Trend Forecast · Drop Queue · Watchlist · Alerts
+
+### #2 · Bug: VIP tier property mismatch (first build error)
+**Symptom:** Vercel build failed at `getVIPSimulation` — `Property 'tierName' does not exist on type '{ name, minSpend, discount, ... }'`
+**Root cause:** `tierDefs` in `data-snapshot.ts` used shorthand names that didn't match `VIPTierData` interface
+**Fix:** Renamed `name`→`tierName`, `minSpend`→`minAnnualSpendEUR`, `discount`→`discountPct`, `earlyAccess`→`earlyAccessDays`, `priority`→`allocationPriority`, `viewing`→`privateViewing`, `shopper`→`personalShopper`. Updated 4 call sites in `analytics.ts` + `vip-panel.tsx`
+
+### #3 · Bug: Tailwind v4 utility classes not compiled
+**Symptom:** Page rendered but with broken layout — KPI cards stacked, bar charts empty, sidebar hidden
+**Root cause:** Used legacy `@tailwind base/components/utilities` directives. Tailwind v4's `@tailwindcss/postcss` plugin does not read `tailwind.config.ts` for content paths
+**Fix:**
+- `globals.css`: replaced with `@import "tailwindcss"` + `@source "../**/*.{ts,tsx,js,jsx,mdx}"` + `@theme` block
+- `tailwind.config.ts`: simplified to stub
+- `package.json`: removed `tailwindcss-animate` (built-in in v4)
+
+### #4 · Bug sweep (caught via real `tsc --noEmit`)
+- `fx-volatility.tsx`: stray `import React from 'react'` at file bottom + `React.useState` call. Moved `useState` to top imports, removed stray React import
+- `page.tsx`: removed unused `Heart` import (kept `Heart as HeartIcon` alias)
+- `layout.tsx`, `page.tsx`, `vip-panel.tsx`: added explicit `import type { ReactNode }` / `ComponentType` for type positions
+
+### #5 · Bug: Price History key-split (`getPriceHistory` crashed at runtime)
+**Symptom:** Clicking Price History → error page
+**Root cause:** Composite key was `${productId}_${region}` producing strings like `prod_0_EU`. `key.split('_')` returned `['prod','0','EU']` and `[productId, region] = ...` destructured to `productId='prod'`, `region='0'` — both wrong. Then `snap.products.find(p => p.id === 'prod')` returned `undefined`, and `product.name` threw `TypeError`
+**Fix:** Use `key.lastIndexOf('_')` + `key.slice(0, lastSep)` / `key.slice(lastSep+1)`. Added defensive `null` filter on movers map
+
+### #6 · Bug: framer-motion incompatible with React 19
+**Symptom:** Webpack build error — `'activeAnimations' is not exported from 'motion-dom'`
+**Fix:** Removed `framer-motion` dep entirely. Panel transitions use CSS `@keyframes editorial-fade-in` (400ms ease) with `fade-in` class. Removed `motion.div` + `AnimatePresence` from `page.tsx`
+
+### #7 · Redesign: editorial aesthetic + dark/light theme
+**Motivation:** "AI slop dashboard" — emoji icons, rainbow palettes, repeated card grids, no typography hierarchy
+**Direction:** editorial-meets-terminal — *FT.com* layout + *Bloomberg Terminal* density + *Linear/Hermès* restraint
+
+**New theme system (`globals.css`):**
+```css
+@theme {
+  --color-bg: #0B0B0D;          /* dark: deep neutral */
+  --color-surface: #131316;
+  --color-ink: #ECECEC;
+  --color-accent: #F97316;       /* single accent, used sparingly */
+  --font-display: "New York", "Iowan Old Style", Charter, Georgia, ui-serif, serif;
+  --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+[data-theme="light"] { --color-bg: #FAFAF7; --color-ink: #0B0B0D; ... }
 ```
 
-Open the dashboard. The data snapshot is generated synchronously on first load and cached forever in memory — no setup, no seeding, no DB.
+**New files:**
+- `src/lib/theme.ts` — `useTheme()` hook + localStorage persistence + OS preference fallback
+- `src/components/ui/panel-shell.tsx` — reusable `PanelShell`, `Section`, `DataTable`, `DataRow`, `KpiStrip`, `ChartTooltip`, `EmptyState`
+
+**Layout changes (`page.tsx`):**
+- Removed `<motion>` panel transitions → CSS `fade-in` class
+- New sticky top bar with breadcrumb + theme toggle pill
+- Sidebar: typographic nav, no emoji icons, single accent dot on active item, category labels in `tracking-[0.14em]` small caps
+
+**Overview hero (`telemetry-overview.tsx`):**
+- Replaced 8-card KPI grid with editorial layout:
+  - Tiny label: "LIVE TELEMETRY · Updated every second"
+  - Massive `hero-num text-[80px]` serif: "38.0%"
+  - Subhead caption
+  - Thin rule
+  - 8-column numerical strip with `tabular-nums`
+  - Inline FX rates strip (mono)
+  - Two chart panels (By Region / By Brand) with restrained single-color bars
+
+**Fully redesigned panels:** `telemetry-overview`, `price-matrix`, `price-history`, `launch-calendar`, `arbitrage-panel`, `brand-pulse`
+**Color-migrated panels** (Tailwind `text-orange-400` → `var(--color-accent)`): `fx-volatility`, `hype-predictor`, `launch-conflicts`, `stock-risk`, `competitive-matrix`, `runway-panel`, `vip-panel`, `sustainability-panel`, `trend-forecast-panel`, `drop-queue-panel`, `watchlist-panel`, `optimizer-panel`
+
+**No-flash theme bootstrap (`layout.tsx`):**
+- Inline `<script>` in `<head>` runs before React hydrates, reads localStorage, sets `data-theme` on `<html>` → zero FOUC
+
+**Typography stack (system fonts, no downloads):**
+- Display: `"New York", "Iowan Old Style", Charter, Georgia, ui-serif, serif`
+- Body: `ui-sans-serif, system-ui, sans-serif`
+- Mono: `"SF Mono", "JetBrains Mono", ui-monospace, monospace`
+- All numeric columns: `font-variant-numeric: tabular-nums` + `font-feature-settings: "tnum", "lnum"`
 
 ---
 
-## 📁 Project structure
+## Deploy
+
+```bash
+# Local
+bun install && bun run dev    # → http://localhost:3000
+
+# Vercel
+vercel --prod                  # zero env vars, zero config
+# OR: push to GitHub → import on vercel.com/new
+```
+
+No env vars. No database. No seeding step.
+
+## File structure
 
 ```
 luxe-tracker-vercel/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx              # Dashboard shell with sidebar nav
-│   │   └── globals.css
+│   │   ├── layout.tsx              # theme bootstrap, no-FOUC
+│   │   ├── page.tsx                # sidebar + panel router (231 LOC)
+│   │   ├── globals.css             # full theme system + editorial utilities
+│   │   └── api/                    # removed — no backend needed
 │   ├── components/
-│   │   ├── ui/                   # Minimal shadcn primitives
-│   │   │   ├── card.tsx, badge.tsx, button.tsx
-│   │   │   ├── input.tsx, tabs.tsx, select.tsx
-│   │   │   ├── progress.tsx, separator.tsx
-│   │   └── features/             # 17 panels + overview
-│   │       ├── telemetry-overview.tsx
-│   │       ├── price-matrix.tsx
-│   │       ├── launch-calendar.tsx
-│   │       ├── arbitrage-panel.tsx
-│   │       ├── optimizer-panel.tsx
-│   │       ├── price-history.tsx
-│   │       ├── fx-volatility.tsx
-│   │       ├── hype-predictor.tsx
-│   │       ├── launch-conflicts.tsx
-│   │       ├── stock-risk.tsx
-│   │       ├── competitive-matrix.tsx
-│   │       ├── brand-pulse.tsx
-│   │       ├── runway-panel.tsx
-│   │       ├── vip-panel.tsx
-│   │       ├── sustainability-panel.tsx
-│   │       ├── trend-forecast-panel.tsx
-│   │       ├── drop-queue-panel.tsx
-│   │       └── watchlist-panel.tsx  # watchlist + alerts
+│   │   ├── ui/                     # card, badge, button, input, progress, separator, select, tabs, panel-shell
+│   │   └── features/               # 17 panels
 │   ├── lib/
-│   │   ├── fashion-types.ts      # 17 feature type definitions
-│   │   ├── data-snapshot.ts      # ⭐ Generates all data (deterministic PRNG)
-│   │   ├── analytics.ts          # ⭐ All calculation functions (17 endpoints)
+│   │   ├── data-snapshot.ts        # deterministic data generation
+│   │   ├── analytics.ts            # 17 query functions
+│   │   ├── fashion-types.ts        # interfaces
+│   │   ├── theme.ts                # useTheme hook
 │   │   └── utils.ts
 │   └── hooks/
-│       └── use-watchlist.ts      # localStorage-backed watchlist + alerts
-├── public/
-│   ├── logo.svg
-│   └── robots.txt
-├── package.json
+│       └── use-watchlist.ts        # localStorage watchlist + alerts
+├── public/{logo.svg,robots.txt}
+├── package.json                    # no framer-motion, no tailwindcss-animate
 ├── next.config.ts
-├── tailwind.config.ts
+├── tailwind.config.ts              # stub (config is in CSS)
 ├── postcss.config.mjs
 ├── tsconfig.json
-├── components.json
-├── .env.example
-├── .gitignore
 └── README.md
 ```
 
----
+## Dataset
 
-## 📊 Dataset shape (generated at build time)
-
-The `src/lib/data-snapshot.ts` module generates a deterministic dataset using a seeded PRNG (mulberry32 with seed `0xc0ffee`):
+Generated at module load via seeded PRNG (mulberry32, seed `0xc0ffee`):
 
 | Entity | Count |
 |---|---|
-| Brands | 5 (Prada, Gucci, Balenciaga, LV, Versace) |
-| Products | 25 (5 per brand × 5 categories) |
-| Regional prices | 125 (25 × 5 regions) |
-| Price history rows | **56,250** (25 × 5 regions × 90 days) |
-| Launches | 125 (5 per product across regions) |
-| Runway shows | 30 (6 per brand) |
-| Sustainability reports | 5 (1 per brand) |
+| Brands | 5 |
+| Products | 25 (5 categories × 5 brands) |
+| Regional prices | 125 (× 5 regions) |
+| Price history rows | **11,375** (91 days × 25 × 5) |
+| Launches | 125 |
+| Runway shows | 30 |
 | Trend forecasts | 20 |
 | Drop queues | 10 |
 
-**To scale beyond this baseline**, open `src/lib/data-snapshot.ts` and modify:
-- `BRAND_DEFS` — add more luxury brands
-- `PRODUCT_DEFS` — add more SKUs per brand
-- The launch/runway/trend loops — bump the iteration counts
+Scale by editing `BRAND_DEFS` / `PRODUCT_DEFS` in `data-snapshot.ts`.
 
-Everything else scales automatically.
+## Tech stack
 
----
+`next@15.1.0` · `react@19` · `typescript@5` · `tailwindcss@4` (`@tailwindcss/postcss`) · `recharts@2.15.4` · `lucide-react@0.525.0` · `class-variance-authority` · `clsx` · `tailwind-merge` · `framer-motion` (REMOVED — React 19 incompat, use CSS)
 
-## 🌐 Hosting guide
+## Caveats
 
-### What you need
+- **Cold starts:** Data is deterministic (same seed = same data on every cold start)
+- **No real-time updates:** Data frozen at build time. For live price scraping, swap snapshot.ts to fetch from a scraper
+- **Watchlist is per-browser** (localStorage), not per-user
 
-| Service | Required? | Why |
-|---|---|---|
-| **GitHub** | ✅ Yes (free) | To store/share your code |
-| **Vercel** | ✅ Yes (free Hobby tier) | Hosts the entire app — frontend, API routes, data layer |
-| **Supabase** | ❌ No | Removed — data lives in-memory |
-| **Render / Railway / Fly.io** | ❌ No | Removed — no backend |
-| **PostgreSQL** | ❌ No | No database |
+## Original repo
 
-### Cost breakdown
+[devtechedge/luxe-tracker](https://github.com/devtechedge/luxe-tracker) — Next.js + Prisma + Supabase. This build is a complete removal of all DB/backend infrastructure.
 
-| Plan | Cost | What you get |
-|---|---|---|
-| **Vercel Hobby** | **$0/mo** | 100 GB bandwidth, serverless functions, HTTPS, custom domains |
-| Vercel Pro | $20/mo | If you need longer functions or more bandwidth |
+## License
 
-**Zero database cost. Zero external service cost. Zero monthly bill.**
-
----
-
-## 🔧 Architecture diagram
-
-```
-┌──────────────────────────────────────────┐
-│           VERCEL (single deploy)         │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │ Next.js 15 + React 19              │  │
-│  │                                    │  │
-│  │  src/lib/data-snapshot.ts          │  │
-│  │    └─ generates 56k rows at load   │  │
-│  │                                    │  │
-│  │  src/lib/analytics.ts              │  │
-│  │    └─ 17 query functions           │  │
-│  │       (all synchronous, in-memory) │  │
-│  │                                    │  │
-│  │  src/app/page.tsx                  │  │
-│  │    └─ Sidebar nav + 17 panels      │  │
-│  │                                    │  │
-│  │  src/hooks/use-watchlist.ts        │  │
-│  │    └─ localStorage-backed          │  │
-│  │       watchlist + alerts           │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  Browser ←→ localStorage (watchlist)     │
-│                                          │
-└──────────────────────────────────────────┘
-```
-
----
-
-## 🧪 Testing the features
-
-Once running:
-
-1. **Click any sidebar item** — switch between 17 panels instantly. No network calls.
-2. **Open Launch Calendar** — see upcoming drops across brands × regions.
-3. **Open Arbitrage Finder** — view buy-cheap / ship-expensive opportunities.
-4. **Open Landed Cost Optimizer** — pick a product + target region, see the cheapest route.
-5. **Open Brand Pulse Radar** — compare all 5 brands on 5 dimensions.
-6. **Add a product to your watchlist** (Drop Queue panel) — it persists in localStorage.
-7. **Open VIP Tier Simulator** — change your annual spend slider, watch your tier change.
-
----
-
-## ⚠️ Caveats (transparent disclosure)
-
-1. **Data resets on Vercel cold start.** This isn't a problem because data is generated deterministically at module load — every cold start produces the *same* dataset (deterministic PRNG). Your watchlist/alerts in localStorage persist across reloads because they live in your browser, not on the server.
-
-2. **Dataset is fixed-size.** The seed baseline is 25 products. To match your live site's 61,229 products, edit `PRODUCT_DEFS` in `src/lib/data-snapshot.ts` — but be aware that 61k products × 90 days × 5 regions = ~27 million price history rows, which will slow down your first render. The current 56k row baseline gives sub-second first paint on Vercel Hobby.
-
-3. **No real-time price updates.** Data is frozen at the moment of the first module load. If you want live updates from Prada/Gucci/LV websites, you'd need a real backend (Supabase + a scraper cron) — that's a different architecture.
-
-4. **No auth, no multi-user.** The original `userId @default("default")` schema was single-user anyway. Watchlist is per-browser via localStorage.
-
-5. **No admin/data refresh UI.** To change data, edit the source and redeploy.
-
----
-
-## 🤝 Credits
-
-- Original repo: [devtechedge/luxe-tracker](https://github.com/devtechedge/luxe-tracker)
-- Restructured from Prisma + Supabase architecture to a zero-backend Vercel-only deployment
-- Inspired by luxury fashion analytics and chaos engineering
-
-## 📄 License
-
-MIT — do whatever you want with it.
+MIT

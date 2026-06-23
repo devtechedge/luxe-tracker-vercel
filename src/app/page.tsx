@@ -2,24 +2,8 @@
 
 import { useState } from 'react'
 import type { ComponentType } from 'react'
-import {
-  Activity,
-  Globe,
-  Plane,
-  TrendingDown,
-  History,
-  TrendingUp,
-  Flame,
-  Swords,
-  AlertTriangle,
-  Users,
-  Crown,
-  Sparkles,
-  Leaf,
-  Bell,
-  Zap,
-  Heart as HeartIcon,
-} from 'lucide-react'
+import { Sun, Moon } from 'lucide-react'
+
 import { TelemetryOverview } from '@/components/features/telemetry-overview'
 import { PriceMatrix } from '@/components/features/price-matrix'
 import { LaunchCalendar } from '@/components/features/launch-calendar'
@@ -38,8 +22,7 @@ import { SustainabilityPanel } from '@/components/features/sustainability-panel'
 import { TrendForecastPanel } from '@/components/features/trend-forecast-panel'
 import { DropQueuePanel } from '@/components/features/drop-queue-panel'
 import { WatchlistPanel, AlertsPanel } from '@/components/features/watchlist-panel'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { useTheme } from '@/lib/theme'
 
 type PanelId =
   | 'overview'
@@ -65,167 +48,195 @@ type PanelId =
 interface NavItem {
   id: PanelId
   label: string
-  icon: ComponentType<{ className?: string }>
   category: 'Intelligence' | 'Pricing' | 'Market' | 'Luxury' | 'Personal'
 }
 
 const NAV: NavItem[] = [
-  { id: 'overview', label: 'Overview', icon: Activity, category: 'Intelligence' },
-  { id: 'launch-calendar', label: 'Launch Calendar', icon: Globe, category: 'Intelligence' },
-  { id: 'price-matrix', label: 'Price Matrix', icon: TrendingDown, category: 'Intelligence' },
-  { id: 'arbitrage', label: 'Arbitrage Finder', icon: Plane, category: 'Pricing' },
-  { id: 'optimizer', label: 'Landed Cost Optimizer', icon: TrendingDown, category: 'Pricing' },
-  { id: 'price-history', label: 'Price History', icon: History, category: 'Pricing' },
-  { id: 'fx-volatility', label: 'FX Volatility', icon: TrendingUp, category: 'Pricing' },
-  { id: 'hype-predictor', label: 'Hype Predictor', icon: Flame, category: 'Market' },
-  { id: 'launch-conflicts', label: 'Launch Conflicts', icon: Swords, category: 'Market' },
-  { id: 'stock-risk', label: 'Stock-Out Risk', icon: AlertTriangle, category: 'Market' },
-  { id: 'competitive-matrix', label: 'Competitive Matrix', icon: Users, category: 'Market' },
-  { id: 'brand-pulse', label: 'Brand Pulse Radar', icon: Zap, category: 'Market' },
-  { id: 'runway', label: 'Runway Tracker', icon: Sparkles, category: 'Luxury' },
-  { id: 'vip-tier', label: 'VIP Tier Simulator', icon: Crown, category: 'Luxury' },
-  { id: 'sustainability', label: 'Sustainability', icon: Leaf, category: 'Luxury' },
-  { id: 'trend-forecast', label: 'Trend Forecast', icon: Flame, category: 'Luxury' },
-  { id: 'drop-queue', label: 'Drop Queue', icon: Users, category: 'Luxury' },
-  { id: 'watchlist', label: 'My Watchlist', icon: HeartIcon, category: 'Personal' },
-  { id: 'alerts', label: 'Alerts', icon: Bell, category: 'Personal' },
+  { id: 'overview', label: 'Overview', category: 'Intelligence' },
+  { id: 'launch-calendar', label: 'Launch Calendar', category: 'Intelligence' },
+  { id: 'price-matrix', label: 'Price Matrix', category: 'Intelligence' },
+  { id: 'arbitrage', label: 'Arbitrage Finder', category: 'Pricing' },
+  { id: 'optimizer', label: 'Landed Cost Optimizer', category: 'Pricing' },
+  { id: 'price-history', label: 'Price History', category: 'Pricing' },
+  { id: 'fx-volatility', label: 'FX Volatility', category: 'Pricing' },
+  { id: 'hype-predictor', label: 'Hype Predictor', category: 'Market' },
+  { id: 'launch-conflicts', label: 'Launch Conflicts', category: 'Market' },
+  { id: 'stock-risk', label: 'Stock-Out Risk', category: 'Market' },
+  { id: 'competitive-matrix', label: 'Competitive Matrix', category: 'Market' },
+  { id: 'brand-pulse', label: 'Brand Pulse', category: 'Market' },
+  { id: 'runway', label: 'Runway Tracker', category: 'Luxury' },
+  { id: 'vip-tier', label: 'VIP Tier Simulator', category: 'Luxury' },
+  { id: 'sustainability', label: 'Sustainability', category: 'Luxury' },
+  { id: 'trend-forecast', label: 'Trend Forecast', category: 'Luxury' },
+  { id: 'drop-queue', label: 'Drop Queue', category: 'Luxury' },
+  { id: 'watchlist', label: 'Watchlist', category: 'Personal' },
+  { id: 'alerts', label: 'Alerts', category: 'Personal' },
 ]
 
 export default function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelId>('overview')
+  const { theme, toggle, hydrated } = useTheme()
 
   const grouped = NAV.reduce<Record<string, NavItem[]>>((acc, item) => {
     ;(acc[item.category] = acc[item.category] || []).push(item)
     return acc
   }, {})
 
+  const activeItem = NAV.find((n) => n.id === activePanel)
+
   return (
-    <div className="min-h-screen bg-[#0a0e17]">
-      {/* Subtle background glow */}
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-32 left-1/3 h-96 w-96 rounded-full bg-orange-500/5 blur-3xl" />
-        <div className="absolute -bottom-32 right-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto flex max-w-[1700px] gap-6 p-6">
-        {/* SIDEBAR */}
-        <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 overflow-y-auto rounded-lg border border-white/5 bg-[#0d1220]/80 backdrop-blur-sm lg:block">
-          {/* Brand */}
-          <div className="border-b border-white/5 p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 text-xl shadow-lg shadow-orange-500/20">
-                👑
+    <div className="min-h-screen">
+      <div className="mx-auto flex max-w-[1500px] gap-0">
+        {/* ============================================================ */}
+        {/* SIDEBAR — refined, typographic                                */}
+        {/* ============================================================ */}
+        <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:block">
+          <div className="flex h-full flex-col">
+            {/* Brand mark */}
+            <div className="px-6 pt-7 pb-6">
+              <div className="flex items-baseline gap-2">
+                <span className="font-display text-xl font-medium tracking-tight text-[var(--color-ink)]">
+                  Luxe
+                </span>
+                <span className="font-display text-xl font-medium tracking-tight text-[var(--color-accent)]">
+                  Tracker
+                </span>
               </div>
-              <div>
-                <h1 className="text-base font-bold tracking-tight text-white">
-                  LUXE TRACKER
-                </h1>
-                <p className="text-[10px] text-gray-500">Global Intelligence · v3.0</p>
-              </div>
+              <p className="mt-1.5 text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                Global Intelligence · v3.0
+              </p>
             </div>
-          </div>
 
-          {/* Nav by category */}
-          <div className="space-y-4 p-3">
-            {Object.entries(grouped).map(([category, items]) => (
-              <div key={category}>
-                <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-600">
-                  {category}
+            <div className="rule mx-6" />
+
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto px-3 py-5">
+              {Object.entries(grouped).map(([category, items]) => (
+                <div key={category} className="mb-5">
+                  <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+                    {category}
+                  </div>
+                  <ul className="space-y-px">
+                    {items.map((item) => {
+                      const isActive = activePanel === item.id
+                      return (
+                        <li key={item.id}>
+                          <button
+                            onClick={() => setActivePanel(item.id)}
+                            className={`group flex w-full items-center justify-between gap-2 rounded px-3 py-1.5 text-left text-[13px] transition-colors ${
+                              isActive
+                                ? 'bg-[var(--color-surface-2)] text-[var(--color-ink)]'
+                                : 'text-[var(--color-ink-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]'
+                            }`}
+                          >
+                            <span>{item.label}</span>
+                            {isActive && (
+                              <span className="size-1 rounded-full bg-[var(--color-accent)]" />
+                            )}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </div>
-                <nav className="space-y-0.5">
-                  {items.map((item) => {
-                    const Icon = item.icon
-                    const isActive = activePanel === item.id
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => setActivePanel(item.id)}
-                        className={`flex w-full items-center gap-2.5 rounded-md px-3 py-1.5 text-left text-xs transition-all ${
-                          isActive
-                            ? 'border border-orange-500/30 bg-orange-500/10 text-orange-300'
-                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        <Icon className="size-3.5 shrink-0" />
-                        <span className="truncate">{item.label}</span>
-                        {isActive && (
-                          <span className="ml-auto size-1.5 rounded-full bg-orange-400" />
-                        )}
-                      </button>
-                    )
-                  })}
-                </nav>
-              </div>
-            ))}
-          </div>
+              ))}
+            </nav>
 
-          {/* Footer info */}
-          <div className="border-t border-white/5 p-4">
-            <div className="text-[10px] uppercase tracking-wider text-gray-600">
-              Architecture
-            </div>
-            <div className="mt-1.5 space-y-1 text-[11px] text-gray-500">
-              <div>📦 In-memory data snapshot</div>
-              <div>⚡ Zero backend · Vercel-only</div>
-              <div>💾 Watchlist → localStorage</div>
+            {/* Footer */}
+            <div className="border-t border-[var(--color-border)] px-6 py-4">
+              <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+                Build
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-ink-subtle)]">
+                Static snapshot · Vercel-only · Watchlist stored locally
+              </p>
             </div>
           </div>
         </aside>
 
-        {/* MAIN CONTENT */}
-        <main className="min-w-0 flex-1 space-y-6">
-          <PanelHeader panelId={activePanel} />
+        {/* ============================================================ */}
+        {/* MAIN CONTENT                                                  */}
+        {/* ============================================================ */}
+        <main className="min-w-0 flex-1">
+          {/* TOP BAR */}
+          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 px-8 py-4 backdrop-blur-md">
+            <div className="flex items-baseline gap-3">
+              <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                {activeItem?.category ?? 'Luxe'}
+              </span>
+              <span className="text-[var(--color-ink-faint)]">/</span>
+              <h1 className="font-display text-base font-medium tracking-tight text-[var(--color-ink)]">
+                {activeItem?.label ?? 'Overview'}
+              </h1>
+            </div>
 
-          <div className="space-y-6">
-            {activePanel === 'overview' && <TelemetryOverview />}
-            {activePanel === 'price-matrix' && <PriceMatrix />}
-            {activePanel === 'launch-calendar' && <LaunchCalendar />}
-            {activePanel === 'arbitrage' && <ArbitragePanel />}
-            {activePanel === 'optimizer' && <OptimizerPanel />}
-            {activePanel === 'price-history' && <PriceHistory />}
-            {activePanel === 'fx-volatility' && <FxVolatility />}
-            {activePanel === 'hype-predictor' && <HypePredictor />}
-            {activePanel === 'launch-conflicts' && <LaunchConflicts />}
-            {activePanel === 'stock-risk' && <StockRisk />}
-            {activePanel === 'competitive-matrix' && <CompetitiveMatrix />}
-            {activePanel === 'brand-pulse' && <BrandPulse />}
-            {activePanel === 'runway' && <RunwayPanel />}
-            {activePanel === 'vip-tier' && <VipPanel />}
-            {activePanel === 'sustainability' && <SustainabilityPanel />}
-            {activePanel === 'trend-forecast' && <TrendForecastPanel />}
-            {activePanel === 'drop-queue' && <DropQueuePanel />}
-            {activePanel === 'watchlist' && (
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <WatchlistPanel />
-                <AlertsPanel />
-              </div>
-            )}
-            {activePanel === 'alerts' && <AlertsPanel />}
-          </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle theme={theme} toggle={toggle} hydrated={hydrated} />
+            </div>
+          </header>
+
+          {/* PANEL CONTENT */}
+          <div key={activePanel} className="fade-in px-8 py-8">
+              {activePanel === 'overview' && <TelemetryOverview />}
+              {activePanel === 'price-matrix' && <PriceMatrix />}
+              {activePanel === 'launch-calendar' && <LaunchCalendar />}
+              {activePanel === 'arbitrage' && <ArbitragePanel />}
+              {activePanel === 'optimizer' && <OptimizerPanel />}
+              {activePanel === 'price-history' && <PriceHistory />}
+              {activePanel === 'fx-volatility' && <FxVolatility />}
+              {activePanel === 'hype-predictor' && <HypePredictor />}
+              {activePanel === 'launch-conflicts' && <LaunchConflicts />}
+              {activePanel === 'stock-risk' && <StockRisk />}
+              {activePanel === 'competitive-matrix' && <CompetitiveMatrix />}
+              {activePanel === 'brand-pulse' && <BrandPulse />}
+              {activePanel === 'runway' && <RunwayPanel />}
+              {activePanel === 'vip-tier' && <VipPanel />}
+              {activePanel === 'sustainability' && <SustainabilityPanel />}
+              {activePanel === 'trend-forecast' && <TrendForecastPanel />}
+              {activePanel === 'drop-queue' && <DropQueuePanel />}
+              {activePanel === 'watchlist' && (
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                  <WatchlistPanel />
+                  <AlertsPanel />
+                </div>
+              )}
+              {activePanel === 'alerts' && <AlertsPanel />}
+      </div>
         </main>
       </div>
     </div>
   )
 }
 
-function PanelHeader({ panelId }: { panelId: PanelId }) {
-  const item = NAV.find((n) => n.id === panelId)
-  if (!item) return null
-  const Icon = item.icon
+// ============================================================
+// THEME TOGGLE — clean editorial pill
+// ============================================================
+function ThemeToggle({
+  theme,
+  toggle,
+  hydrated,
+}: {
+  theme: 'dark' | 'light'
+  toggle: () => void
+  hydrated: boolean
+}) {
   return (
-    <div className="flex items-center justify-between border-b border-white/5 pb-4">
-      <div className="flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-lg bg-orange-500/15 text-orange-400">
-          <Icon className="size-5" />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-white">{item.label}</h2>
-          <p className="text-xs text-gray-500">Category: {item.category}</p>
-        </div>
-      </div>
-      <Badge variant="outline" className="text-[10px] uppercase">
-        v3.0
-      </Badge>
-    </div>
+    <button
+      onClick={toggle}
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      className="group flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[var(--color-ink-muted)] transition-all hover:border-[var(--color-border-strong)] hover:text-[var(--color-ink)]"
+    >
+      {hydrated && theme === 'dark' ? (
+        <>
+          <Moon className="size-3" />
+          <span>Dark</span>
+        </>
+      ) : (
+        <>
+          <Sun className="size-3" />
+          <span>Light</span>
+        </>
+      )}
+    </button>
   )
 }
