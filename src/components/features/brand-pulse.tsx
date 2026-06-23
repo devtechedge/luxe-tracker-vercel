@@ -34,9 +34,9 @@ export function BrandPulse() {
     >
       {/* HEADLINE METRIC */}
       {headline && (
-        <div className="rule grid grid-cols-1 gap-6 py-5 lg:grid-cols-[1fr,1fr]">
-          <div>
-            <div className="label mb-1">Leading brand</div>
+        <div className="rule grid grid-cols-1 gap-6 py-6 lg:grid-cols-[1fr,1fr]">
+          <div className="min-w-0">
+            <div className="label mb-1.5">Leading brand</div>
             <h3 className="font-display text-[26px] font-medium tracking-tight text-[var(--color-ink)]">
               {headline.brand}
             </h3>

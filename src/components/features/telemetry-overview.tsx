@@ -61,10 +61,10 @@ export function TelemetryOverview() {
 
         {/* Metric grid — 8 columns of typographic numbers */}
         <div className="rule" />
-        <div className="grid grid-cols-2 gap-x-6 gap-y-5 py-5 md:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 py-6 md:grid-cols-4 lg:grid-cols-8">
           {metrics.map((m) => (
-            <div key={m.label}>
-              <div className="label mb-1">{m.label}</div>
+            <div key={m.label} className="min-w-0">
+              <div className="label mb-1.5">{m.label}</div>
               <div
                 className={`hero-num text-[26px] ${
                   m.accent ? 'text-[var(--color-accent)]' : 'text-[var(--color-ink)]'

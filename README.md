@@ -71,16 +71,21 @@ Single Vercel deployment
 - Verified: 0 occurrences of hardcoded `bg-[#0d1220]`, `bg-white/5`, `text-red-400` in compiled HTML
 
 ### #9 · Refactor: visual uniformity + responsive alignment
-**Motivation:** 18 panels had inconsistent spacing, KPI grids, chart heights, section dividers, and no mobile sidebar. Three panels (Telemetry Overview, Price Matrix, Price History) didn't use `PanelShell`, creating structural drift from the other 15.
+**Motivation:** 18 panels had inconsistent spacing, KPI grids, chart heights, section dividers, and no mobile sidebar. Three panels (Telemetry Overview, Price Matrix, Price History) didn't use `PanelShell`, creating structural drift from the other 15. KPI strip numbers clumped together — hero digits (`text-[36px]`) too large for the tight `gap-y-4` vertical gap, causing visual crowding in FX Volatility, Launch Conflicts, Stock-Out Risk, and Drop Queue panels.
 **Changes:**
 - `page.tsx`: Added mobile sidebar (slide-over drawer with hamburger toggle + overlay backdrop). Responsive padding `px-4 md:px-8` on panel content area. Extracted `SidebarContent` component shared between desktop `<aside>` and mobile drawer.
-- `panel-shell.tsx`: Added `ChartPanel` and `EditorialTooltip` as shared exports (previously duplicated locally in `telemetry-overview.tsx`). Added `cols` prop to `KpiStrip`. Section padding standardised to `py-5`.
-- `telemetry-overview.tsx`: Wrapped in `PanelShell` (was the only panel without it). Hero number now responsive `text-[48px] md:text-[64px] lg:text-[80px]`. Replaced local `ChartPanel` + `EditorialTooltip` with shared imports from `panel-shell`.
-- `price-matrix.tsx`: Wrapped in `PanelShell`. Filter row now stacks vertically on mobile, horizontal on `sm+`. Table wrapped in `overflow-x-auto` with `min-w-[700px]` for mobile horizontal scroll.
-- `price-history.tsx`: Wrapped in `PanelShell`. 90d change hero number responsive `text-[48px] md:text-[56px] lg:text-[64px]`. `border-l` on sidebar column now only appears at `lg:`. Top Movers table wrapped in `overflow-x-auto`.
-- All 15 remaining panels: standardised KPI strip grids (`grid-cols-2 md:grid-cols-4`), removed stray `mb-8` after KPI strips, chart heights unified to `h-[260px]` (radar charts stay `h-44`), section padding unified to `py-5`, two-column layouts use `lg:grid-cols-[1fr,300px]` with `lg:border-l`, article row padding unified to `py-4`, card grids use `md:grid-cols-2 xl:grid-cols-3` with `p-4` padding, filter bars use `border-b border-[var(--color-border)]`.
-- Brand Pulse: switched from individual `border` cards to unified `gap-px` grid pattern matching Competitive Matrix and Sustainability.
-- Hype Predictor: fixed JSX mismatch (extra `</div>`) introduced during filter bar restructuring.
+- `panel-shell.tsx`: Added `ChartPanel` and `EditorialTooltip` as shared exports. KPI strip: `gap-y-4 py-5` → `gap-y-6 py-6`, label `mb-1` → `mb-1.5`, hero-num `text-[22px]` → `text-[24px]`, added `min-w-0` to each item. Added `cols` prop to `KpiStrip`.
+- All 6 inline KPI strips (FX Volatility, Launch Conflicts, Stock-Out Risk, Drop Queue, Sustainability, Telemetry Overview): `gap-y-4 py-5` → `gap-y-6 py-6`, `mb-1` → `mb-1.5`, hero-num `text-[36px]` → `text-[28px]`, added `min-w-0` to prevent text overflow.
+- FX Volatility: KPI buttons now have `p-3` padding + `rounded` + active `bg-[var(--color-surface)]` highlight. Risk label `mt-1` → `mt-1.5`.
+- Launch Conflicts: Conflict days rows changed from `flex-row` to `flex-col md:flex-row` for mobile stacking. Brand list `gap-2` → `gap-3`. Date/launch info `gap-4` → `gap-3 md:gap-4`.
+- Drop Queue: Progress bar and position label `mt-1` → `mt-1.5` for breathing room.
+- Brand Pulse: headline grid `py-5` → `py-6`, `mb-1` → `mb-1.5`, added `min-w-0`.
+- `telemetry-overview.tsx`: Wrapped in `PanelShell`. Hero number responsive `text-[48px] md:text-[64px] lg:text-[80px]`. Metric grid `gap-y-5 py-5` → `gap-y-6 py-6`, `mb-1` → `mb-1.5`, `min-w-0` added. Replaced local `ChartPanel` + `EditorialTooltip` with shared imports.
+- `price-matrix.tsx`: Wrapped in `PanelShell`. Filter row stacks vertically on mobile, horizontal on `sm+`. Table wrapped in `overflow-x-auto` with `min-w-[700px]`.
+- `price-history.tsx`: Wrapped in `PanelShell`. 90d change hero number responsive. `border-l` on sidebar column only at `lg:`. Top Movers table in `overflow-x-auto`.
+- All 15 remaining panels: standardised KPI strip grids, chart heights unified to 260px, section padding `py-5`, two-column layouts `lg:grid-cols-[1fr,300px]`, article rows `py-4`, card grids `md:grid-cols-2 xl:grid-cols-3 p-4`.
+- Brand Pulse: switched from individual `border` cards to unified `gap-px` grid pattern.
+- Hype Predictor: fixed JSX mismatch (extra `</div>`).
 
 ### #7 · Redesign: editorial aesthetic + dark/light theme
 **Motivation:** "AI slop dashboard" — emoji icons, rainbow palettes, repeated card grids, no typography hierarchy

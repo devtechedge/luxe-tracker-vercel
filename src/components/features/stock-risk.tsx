@@ -16,22 +16,22 @@ export function StockRisk() {
       caption="Sell-out probability based on inventory fill, hype score, and time to launch. Earlier intervention saves revenue."
     >
       {/* KPI strip */}
-      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
-        <div>
-          <div className="label mb-1">Tracked SKUs</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.totalEntries}</div>
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-4">
+        <div className="min-w-0">
+          <div className="label mb-1.5">Tracked SKUs</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">{data.totalEntries}</div>
         </div>
-        <div>
-          <div className="label mb-1">Critical</div>
-          <div className="hero-num text-[36px] text-[var(--color-negative)]">{data.criticalCount}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">Critical</div>
+          <div className="hero-num text-[28px] text-[var(--color-negative)]">{data.criticalCount}</div>
         </div>
-        <div>
-          <div className="label mb-1">High</div>
-          <div className="hero-num text-[36px] text-[var(--color-warning)]">{data.highCount}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">High</div>
+          <div className="hero-num text-[28px] text-[var(--color-warning)]">{data.highCount}</div>
         </div>
-        <div>
-          <div className="label mb-1">Avg risk</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">
+        <div className="min-w-0">
+          <div className="label mb-1.5">Avg risk</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">
             {data.topRisks.length > 0
               ? Math.round(data.topRisks.reduce((s, r) => s + r.riskScore, 0) / data.topRisks.length)
               : 0}

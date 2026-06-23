@@ -176,12 +176,12 @@ interface KpiStripProps {
 
 export function KpiStrip({ items, cols = 4 }: KpiStripProps) {
   return (
-    <div className={`rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-${cols}`}>
+    <div className={`rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-${cols}`}>
       {items.map((item) => (
-        <div key={item.label}>
-          <div className="label mb-1">{item.label}</div>
+        <div key={item.label} className="min-w-0">
+          <div className="label mb-1.5">{item.label}</div>
           <div
-            className={`hero-num text-[22px] ${
+            className={`hero-num text-[24px] ${
               item.accent ? 'text-[var(--color-accent)]' : 'text-[var(--color-ink)]'
             }`}
           >

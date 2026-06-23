@@ -32,10 +32,10 @@ export function SustainabilityPanel() {
       caption="Composite sustainability scores per maison. Higher = better ESG performance."
     >
       {/* KPI strip */}
-      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-5">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-5">
         {metrics.map((m) => (
-          <div key={m.brandId}>
-            <div className="label mb-1">{m.brand}</div>
+          <div key={m.brandId} className="min-w-0">
+            <div className="label mb-1.5">{m.brand}</div>
             <div className="hero-num text-[28px] tabular-nums" style={{ color: BRAND_COLORS[m.brand] }}>
               {m.overallScore}
             </div>

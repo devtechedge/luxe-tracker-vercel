@@ -26,22 +26,22 @@ export function LaunchConflicts() {
       caption="Identifies overlapping drop windows that cannibalize demand. Brighter bars = higher launch density in that week."
     >
       {/* KPI strip */}
-      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
-        <div>
-          <div className="label mb-1">Total conflicts</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.totalConflicts}</div>
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-4">
+        <div className="min-w-0">
+          <div className="label mb-1.5">Total conflicts</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">{data.totalConflicts}</div>
         </div>
-        <div>
-          <div className="label mb-1">High risk</div>
-          <div className="hero-num text-[36px] text-[var(--color-negative)]">{high}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">High risk</div>
+          <div className="hero-num text-[28px] text-[var(--color-negative)]">{high}</div>
         </div>
-        <div>
-          <div className="label mb-1">Medium risk</div>
-          <div className="hero-num text-[36px] text-[var(--color-warning)]">{medium}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">Medium risk</div>
+          <div className="hero-num text-[28px] text-[var(--color-warning)]">{medium}</div>
         </div>
-        <div>
-          <div className="label mb-1">Weeks tracked</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">{data.weeklyDensity.length}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">Weeks tracked</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">{data.weeklyDensity.length}</div>
         </div>
       </div>
 
@@ -74,9 +74,9 @@ export function LaunchConflicts() {
           {data.conflictDays.slice(0, 8).map((day) => (
             <article
               key={day.date}
-              className="flex items-baseline justify-between gap-4 border-b border-[var(--color-border)] py-4 transition-colors hover:bg-[var(--color-surface)]"
+              className="flex flex-col gap-1 border-b border-[var(--color-border)] py-4 transition-colors hover:bg-[var(--color-surface)] md:flex-row md:items-baseline md:justify-between md:gap-4"
             >
-              <div className="flex items-baseline gap-4">
+              <div className="flex flex-wrap items-baseline gap-3 md:gap-4">
                 <span className="font-mono text-[12px] tabular-nums text-[var(--color-ink)]">{day.date}</span>
                 <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
                   {day.eventCount} launches
@@ -93,7 +93,7 @@ export function LaunchConflicts() {
                   {day.cannibalizationRisk} risk
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-3 mt-1 md:mt-0">
                 {day.brands.slice(0, 4).map((b) => (
                   <span key={b} className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-muted)]">
                     {b}

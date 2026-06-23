@@ -33,20 +33,20 @@ export function FxVolatility() {
       caption="Range, volatility, and risk score per currency pair. Higher volatility = greater exposure to FX swings."
     >
       {/* KPI strip */}
-      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-4">
         {data.pairs.slice(0, 4).map((p) => (
           <button
             key={p.pair}
             onClick={() => setFeaturedIdx(data.pairs.indexOf(p))}
-            className={`text-left transition-opacity hover:opacity-80 ${
-              p.pair === featured.pair ? '' : 'opacity-60'
+            className={`min-w-0 rounded p-3 text-left transition-opacity hover:opacity-80 ${
+              p.pair === featured.pair ? 'bg-[var(--color-surface)]' : 'opacity-60'
             }`}
           >
-            <div className="label mb-1">{p.pair}</div>
+            <div className="label mb-1.5">{p.pair}</div>
             <div className="hero-num text-[28px] tabular-nums text-[var(--color-ink)]">
               {p.currentRate.toFixed(4)}
             </div>
-            <div className="mt-1 text-[10px] uppercase tracking-[0.12em]" style={{ color: RISK_COLOR[p.riskLevel] }}>
+            <div className="mt-1.5 text-[10px] uppercase tracking-[0.12em]" style={{ color: RISK_COLOR[p.riskLevel] }}>
               {p.riskLevel} risk
             </div>
           </button>

@@ -36,22 +36,22 @@ export function DropQueuePanel() {
       caption="Raffles, waitlists, and invite-only drops. Your simulated position vs total slots indicates odds of securing the item."
     >
       {/* KPI strip */}
-      <div className="rule grid grid-cols-2 gap-x-8 gap-y-4 py-5 md:grid-cols-4">
-        <div>
-          <div className="label mb-1">Active queues</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">{drops.length}</div>
+      <div className="rule grid grid-cols-2 gap-x-8 gap-y-6 py-6 md:grid-cols-4">
+        <div className="min-w-0">
+          <div className="label mb-1.5">Active queues</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">{drops.length}</div>
         </div>
-        <div>
-          <div className="label mb-1">Open now</div>
-          <div className="hero-num text-[36px] text-[var(--color-positive)]">{open}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">Open now</div>
+          <div className="hero-num text-[28px] text-[var(--color-positive)]">{open}</div>
         </div>
-        <div>
-          <div className="label mb-1">Upcoming</div>
-          <div className="hero-num text-[36px] text-[var(--color-warning)]">{upcoming}</div>
+        <div className="min-w-0">
+          <div className="label mb-1.5">Upcoming</div>
+          <div className="hero-num text-[28px] text-[var(--color-warning)]">{upcoming}</div>
         </div>
-        <div>
-          <div className="label mb-1">Avg odds</div>
-          <div className="hero-num text-[36px] text-[var(--color-ink)]">
+        <div className="min-w-0">
+          <div className="label mb-1.5">Avg odds</div>
+          <div className="hero-num text-[28px] text-[var(--color-ink)]">
             {drops.length > 0
               ? `${Math.round(
                   (drops.reduce((s, d) => s + d.oddsOfSuccess, 0) / drops.length) * 100,
@@ -99,8 +99,8 @@ export function DropQueuePanel() {
                       {d.filledSlots} / {d.totalSlots}
                     </span>
                   </div>
-                  <Progress value={fillPct} className="mt-1" indicatorClassName="bg-[var(--color-accent)]" />
-                  <div className="mt-1 flex items-baseline justify-between text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                  <Progress value={fillPct} className="mt-1.5" indicatorClassName="bg-[var(--color-accent)]" />
+                  <div className="mt-1.5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
                     <span>Your position</span>
                     <span className="font-mono tabular-nums text-[var(--color-accent)]">
                       #{d.userPosition ?? '—'}
