@@ -148,7 +148,7 @@ export function VipPanel() {
                     {isNext && <Badge variant="warning">Next</Badge>}
                   </div>
                   <div className="text-[11px] text-gray-500">
-                    Min spend {fmtEUR(tier.minSpend, 0)} · {tier.discountPct}% off ·{' '}
+                    Min spend {fmtEUR(tier.minAnnualSpendEUR, 0)} · {tier.discountPct}% off ·{' '}
                     {tier.earlyAccessDays}d early
                   </div>
                 </div>
