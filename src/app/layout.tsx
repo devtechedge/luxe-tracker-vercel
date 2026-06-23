@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Luxe Tracker — Global Launch & Price Disparity',
   description:
     'High-fashion global launch and price disparity tracker. 5 brands · 25 products · 11k+ price history rows · 15 intelligence modules.',
+  other: {
+    'build-version': 'v3.1-202606232242',
+  },
 }
 
 // Inline script that runs BEFORE React hydrates, applies the saved theme
